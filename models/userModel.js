@@ -8,13 +8,14 @@ const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true},
   password: { type: String, required: true, select: false},
+  phoneNumber: {type: Number},
   passKey: { 
     id: String,
     publicKey: String,
     counter: Number,
     transports: [String]
   },
-  role: { type: String, enum: ['agent', 'user'], required: true},
+  role: { type: String, enum: ['admin', 'user'], required: true},
   otp: { type: String },
   otpExpires: {type: Date },
   isSuspended: {type: Boolean, default: false},
