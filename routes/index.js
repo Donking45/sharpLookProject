@@ -1,5 +1,5 @@
 const authRoute = require('./authRoute')
-const vendorRoute = require('./routes/vendorRoute')
+const vendorRoute = require('./vendorRoute')
 
 
 
