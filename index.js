@@ -1,6 +1,6 @@
 const express  = require("express")
 const mongoose = require("mongoose")
-const routes = require('./routes/index.js')
+const routes = require('./routes')
 const cors = require('cors')
 
 require('dotenv').config(); 
@@ -13,8 +13,9 @@ app.use(cors())
 app.use(express.json())
 
 // Routes
-app.use('/api/v1/', routes);
-
+routes.forEach(route => {
+  app.use('/api/v1', route);
+});
 
 
 

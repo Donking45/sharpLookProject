@@ -12,6 +12,6 @@ router.post('/vendor/register', vendorRegister);
 router.post('/vendor/upload', uploadDocs);
 router.post('/vendor/availability', setAvailability);
 router.post('/vendor/service-area', setServiceArea);
-router.get('/vendor/profile/:id', getVendorProfile);
+router.get('/vendor/profile/:vendorId', getVendorProfile);
 
 module.exports = router;

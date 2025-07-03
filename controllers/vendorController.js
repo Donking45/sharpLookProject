@@ -98,6 +98,7 @@ const setServiceArea = async (req, res) => {
 const getVendorProfile = async (req, res) => {
   try {
     const { vendorId } = req.params;
+    console.log("Request received with vendorId:", vendorId);
     const vendor = await Vendor.findById(vendorId).select('-password'); // exclude password
     if (!vendor) return res.status(404).json({ message: "Vendor not found" });
 
