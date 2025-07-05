@@ -7,7 +7,6 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true},
   password: { type: String, required: true, select: false},
-  phoneNumber: {type: String, required: true},
   passKey: { 
     id: String,
     publicKey: String,
@@ -17,9 +16,7 @@ const userSchema = new mongoose.Schema({
   preferences: Object,
   paymentMethods: [Object],
   emailOTP: { type: String },
-  phoneOTP: {type: String },
   emailOTPExpires: {type: Date },
-  phoneOTPExpires: {type: Date },
   isSuspended: {type: Boolean, default: false},
   isVerified: {type: Boolean, default: false },
   isOtpVerified: {type: Boolean, default: false },
