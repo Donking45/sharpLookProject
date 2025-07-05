@@ -129,7 +129,10 @@ const authRegistration = async (req, res) => {
       return res.status(400).json({ message: "User account already exists" });
     }
 
-
+    // Generate OTPs
+    const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    const phoneOTP = Math.floor(1000 + Math.random() * 9000).toString();
+  
     const newUser = new User({
       email,
       password,
@@ -143,9 +146,7 @@ const authRegistration = async (req, res) => {
 
     await newUser.save();
 
-    // Generate OTPs
-    const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    const phoneOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    
 
     // Send Email OTP
     await sendEmail({
