@@ -106,9 +106,9 @@ const User = require('../models/userModel');
 
 const authRegistration = async (req, res) => {
   try {
-    const { email, password, confirmPassword } = req.body;
+    const { email, password, confirmPassword, phoneNumber } = req.body;
 
-    if (!email || !password || !confirmPassword ) {
+    if (!email || !password || !confirmPassword || !phoneNumber ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -133,9 +133,12 @@ const authRegistration = async (req, res) => {
     const newUser = new User({
       email,
       password,
-      otp,
+      phoneNumber,
+      emailOTP,
+      phoneOTP,
       isVerified: false,
-      otpExpires: new Date(Date.now() + 10 * 60 * 1000)
+      emailOTPExpires: new Date(Date.now() + 10 * 60 * 1000),
+      phoneOTPExpires: new Date(Date.now() + 10 * 60 * 1000)
     });
 
     await newUser.save();
