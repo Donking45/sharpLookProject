@@ -58,7 +58,7 @@ const authRegistration = async (req, res) => {
     
 
     res.status(201).json({
-      message: "User registered. OTPs sent to email and phone (for info only).",
+      message: "User registered. OTP sent to email.",
       userId: newUser._id,
     });
 
