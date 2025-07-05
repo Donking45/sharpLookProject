@@ -1,17 +1,15 @@
 const bcrypt = require('bcryptjs');
 const { sendEmail, validEmail } = require('../utils/sendMail')
-const {sendSMS } = require('../utils/sendSMS')
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
 
 const authRegistration = async (req, res) => {
   
-
   try {
-    const { email, password, confirmPassword, phoneNumber } = req.body;
+    const { email, password, confirmPassword } = req.body;
     
-    if (!email || !password || !confirmPassword || !phoneNumber ) {
+    if (!email || !password || !confirmPassword ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -32,19 +30,18 @@ const authRegistration = async (req, res) => {
       return res.status(400).json({ message: "User account already exists" });
     }
 
-    // Generate OTPs
+    // Generate OTP
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    const phoneOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
   
     const newUser = new User({
       email,
       password,
-      phoneNumber,
+      confirmPassword,
       emailOTP,
-      phoneOTP,
       isVerified: false,
       emailOTPExpires: new Date(Date.now() + 10 * 60 * 1000),
-      phoneOTPExpires: new Date(Date.now() + 10 * 60 * 1000)
+      
     });
 
     await newUser.save();
@@ -58,9 +55,7 @@ const authRegistration = async (req, res) => {
       message: `Your email OTP is: ${emailOTP}`,
     });
 
-    // Send SMS OTP (mock for now)
-    console.log(`Send SMS to ${phoneNumber}: Your phone OTP is ${phoneOTP}`);
-     await sendSMS(phoneNumber, `Your phone OTP is: ${phoneOTP}`);
+    
 
     res.status(201).json({
       message: "User registered. OTPs sent to email and phone (for info only).",
@@ -311,9 +306,7 @@ module.exports = {
   authRegistration,
   verifyUserOtp,
   loginUser,
- 
   forgotPassword,
-  
   resetPassword,
 }
     
