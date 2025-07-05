@@ -5,7 +5,6 @@ const bcrypt = require('bcryptjs');
 //const ErrorResponse = require('../utils/errorResponse');
 
 const userSchema = new mongoose.Schema({
-  fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true},
   password: { type: String, required: true, select: false},
   phoneNumber: {type: Number},
@@ -17,7 +16,7 @@ const userSchema = new mongoose.Schema({
   },
   preferences: Object,
   paymentMethods: [Object],
-  role: { type: String, enum: ['admin', 'user'], required: true},
+  //role: { type: String, enum: ['admin', 'user'], required: true},
   emailOTP: { type: String },
   phoneOTP: {type: String },
   emailOTPExpires: {type: Date },
