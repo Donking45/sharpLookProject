@@ -15,6 +15,8 @@ const userSchema = new mongoose.Schema({
     counter: Number,
     transports: [String]
   },
+  preferences: Object,
+  paymentMethods: [Object],
   role: { type: String, enum: ['admin', 'user'], required: true},
   otp: { type: String },
   otpExpires: {type: Date },
@@ -24,6 +26,17 @@ const userSchema = new mongoose.Schema({
   isAdmin:{type: Boolean, default: false}
   
 }, { timestamps: true });
+
+const updateProfile = async (req, res) => {
+  const {id} = req.user;
+  try {
+    const updated = await User.findByIdAndUpdate(id, req.body, { new: true})
+    res.status(200).json({ updated });
+  } catch (err) {
+    res.status(500).json({message: err.message})
+  }
+};
+
 /*
 userSchema.methods.createResetPasswordToken = function (){
   const resetToken = crypto.randomBytes(32).toString('hex')

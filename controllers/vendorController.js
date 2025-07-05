@@ -64,7 +64,6 @@ const setAvailability = async (req, res) => {
     vendor.availability = availability;
     await vendor.save();
 
-
     res.status(200).json({ message: "Availability set successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });

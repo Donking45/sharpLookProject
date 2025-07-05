@@ -1,14 +1,14 @@
 const bcrypt = require('bcryptjs');
-const { sendEmail, validEmail } = require('../utils/sendMail')
+const { sendEmail, validEmail, sendSMS } = require('../utils/sendMail')
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const { generateRegistrationOptions } = require('@simplewebauthn/server');
-const  {USERS, getUserByEmail, getUserById, createUser, updateUserCounter} = require("../db")
-const RP_ID = "localhost"
+//const { generateRegistrationOptions } = require('@simplewebauthn/server');
+//const  {USERS, getUserByEmail, getUserById, createUser, updateUserCounter} = require("../db")
+//const RP_ID = "localhost"
 
 
 
-const bioRegistration= async (req, res) => {
+/*const bioRegistration= async (req, res) => {
   try {
     const email = req.query.email;
 
@@ -41,11 +41,11 @@ const bioRegistration= async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-};
+};*/
 
-const authRegistration = async (req, res) => {
+/*const authRegistration = async (req, res) => {
   try {
-    const { fullName, email, password, phoneNumber, role } = req.body
+    const { email, password, confirmPassword, phoneNumber } = req.body
   
     if (!email){
       return res.status(400).json({
@@ -80,12 +80,12 @@ const authRegistration = async (req, res) => {
     }
     
   
-    const newUser = new User({ 
-      fullName,
+    const newUser = new User({
       email, 
-      password, 
+      password,
+      confirmPassword,
       phoneNumber,
-      role: role || 'admin'
+  
       
     })
   
@@ -94,7 +94,7 @@ const authRegistration = async (req, res) => {
     
     res.status(201).json({
       message: "User account created successfully",
-      newUser: { fullName, email, password, phoneNumber, role}
+      newUser: { email, password, confirmPassword, phoneNumber }
     })
   
   } catch (error) {
@@ -102,9 +102,113 @@ const authRegistration = async (req, res) => {
         message: error.message
       })
   }
-}
+}*/
 
-const verifyBioRegister =  async (req, res) => {
+const authRegistration = async (req, res) => {
+  try {
+    const { email, password, confirmPassword } = req.body;
+
+    if (!email || !password || !confirmPassword ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (!validEmail(email)) {
+      return res.status(400).json({ message: "Incorrect email format" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password should be minimum of 6 characters" });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User account already exists" });
+    }
+
+
+    const newUser = new User({
+      email,
+      password,
+      otp,
+      isVerified: false,
+      otpExpires: new Date(Date.now() + 10 * 60 * 1000)
+    });
+
+    await newUser.save();
+
+    // Generate OTPs
+    const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    const phoneOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
+    // Send Email OTP
+    await sendEmail({
+      email,
+      subject: "Email Verification OTP",
+      message: `Your email OTP is: ${emailOTP}`,
+    });
+
+    // Send SMS OTP (mock for now)
+    console.log(`Send SMS to ${phoneNumber}: Your phone OTP is ${phoneOTP}`);
+     await sendSMS(phoneNumber, `Your phone OTP is: ${phoneOTP}`);
+
+    res.status(201).json({
+      message: "User registered. OTPs sent to email and phone (for info only).",
+      userId: newUser._id,
+    });
+
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const verifyUserOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  if (user.otp !== otp) {
+    return res.status(400).json({ message: "Incorrect OTP" });
+  }
+
+  if (user.otpExpires < Date.now()) {
+    return res.status(400).json({ message: "OTP expired" });
+  }
+
+  user.isVerified = true;
+  user.otp = undefined;
+  user.otpExpires = undefined;
+
+  await user.save();
+
+  res.status(200).json({ message: "Account verified successfully" });
+};
+
+
+
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  if (!user.isVerified) return res.status(401).json({ message: "Please verify your account first" });
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.status(400).json({ message: "Incorrect password" });
+
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+  res.status(200).json({ message: "Login successful", token });
+};
+
+
+/*const verifyBioRegister =  async (req, res) => {
   try {
     const regInfo = JSON.parse(req.cookies.regInfo)
 
@@ -188,10 +292,10 @@ const loginWithBio = async (req, res) => {
     console.error("Login error:", error);
     res.status(500).json({ error: "Login not successful" });
   }
-};
+};*/
 
 
-const loginWithAuth =  async (req, res) => {
+/*const loginWithAuth =  async (req, res) => {
   try{
     const { email, password } = req.body
      
@@ -277,10 +381,10 @@ const loginWithAuth =  async (req, res) => {
     });
   }   
 };
+*/
 
 
-
-        
+      /*  
         const verifyAuth = async (req, res) => {
           try {
             const authInfo = JSON.parse(req.cookies.authInfo);
@@ -322,7 +426,7 @@ const loginWithAuth =  async (req, res) => {
             res.status(500).json({ message: error.message });
           }
         };
-        
+        */
 
 const forgotPassword = async (req, res, next) => {
 
@@ -370,7 +474,7 @@ const forgotPassword = async (req, res, next) => {
 
 }
 
-const verifyEmail = async (req, res, next) => {
+/*const verifyEmail = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
 
@@ -461,15 +565,15 @@ const verifyOTP = async (req, res, next) => {
     return next(error);
   }
 };
-
+*/
 
 
 const resetPassword = async (req, res, next) => {
   try{
-    const {email, newPassword, confirmPassword } = req.body
+    const {newPassword, confirmPassword } = req.body
     
 
-  if(!email || !newPassword || !confirmPassword){
+  if(!newPassword || !confirmPassword){
     return res.status(400).json({
       message: "All fields are required"
     });
@@ -517,15 +621,17 @@ const resetPassword = async (req, res, next) => {
   
 
 module.exports = {
-  bioRegistration,
+  //bioRegistration,
   authRegistration,
-  verifyBioRegister,
-  loginWithBio,
-  loginWithAuth,
-  verifyAuth,
+  verifyUserOtp,
+  loginUser,
+  //verifyBioRegister,
+  //loginWithBio,
+  //loginWithAuth,
+  //verifyAuth,
   forgotPassword,
-  verifyEmail,
-  verifyOTP,
+  //verifyEmail,
+  //verifyOTP,
   resetPassword,
 }
     

@@ -7,7 +7,10 @@ const vendorSchema = new mongoose.Schema({
   password: String,
   bio: String,
   category: String, // e.g. makeup, nails, hair
-  location: String,
+  location: {
+    type: { type: String, default: 'Point' },
+    coordinates: [Number]
+  },
   documents: {
     idCard: String,
     certificate: String
