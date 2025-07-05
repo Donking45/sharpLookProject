@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
-const { sendEmail, validEmail, sendSMS } = require('../utils/sendMail')
+const { sendEmail, validEmail } = require('../utils/sendMail')
+const {sendSMS } = require('../utils/sendSMS')
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 //const { generateRegistrationOptions } = require('@simplewebauthn/server');
