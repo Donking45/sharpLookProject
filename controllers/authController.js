@@ -25,12 +25,7 @@ const User = require('../models/userModel');
     }
 
 
-    const options = await generateRegistrationOptions({
-      rpID: RP_ID,
-      rpName: "SharpLook API",
-      userName: email,
-    });
-
+    
 
     res.cookie("regInfo", JSON.stringify({
       email,
@@ -106,10 +101,11 @@ const User = require('../models/userModel');
 }*/
 
 const authRegistration = async (req, res) => {
+  
+
   try {
     const { email, password, confirmPassword, phoneNumber } = req.body;
-    console.log("Incoming request body:", req.body)
-
+    
     if (!email || !password || !confirmPassword || !phoneNumber ) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -178,17 +174,17 @@ const verifyUserOtp = async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  if (user.otp !== otp) {
+  if (user.emailOTP !== otp) {
     return res.status(400).json({ message: "Incorrect OTP" });
   }
 
-  if (user.otpExpires < Date.now()) {
+  if (user.emailOTPExpires < Date.now()) {
     return res.status(400).json({ message: "OTP expired" });
   }
 
   user.isVerified = true;
-  user.otp = undefined;
-  user.otpExpires = undefined;
+  user.emailOTP = undefined;
+  user.emailOTPExpires = undefined;
 
   await user.save();
 

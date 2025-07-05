@@ -17,7 +17,11 @@ const {
 
 
 //router.get('/bio/register', bioRegistration);
-router.post('/auth/register', authRegistration)
+router.post('/auth/register', (req, res) => {
+    console.log("Incoming request body:")
+    return  authRegistration(req, res)
+})
+
 router.post('/auth/verify-otp', verifyUserOtp)
 router.post('/auth/login', loginUser)
 //router.post('/verify-bio', verifyBioRegister)
