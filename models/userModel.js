@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema({
   },
   preferences: Object,
   paymentMethods: [Object],
-  //role: { type: String, enum: ['admin', 'user'], required: true},
   emailOTP: { type: String },
   phoneOTP: {type: String },
   emailOTPExpires: {type: Date },

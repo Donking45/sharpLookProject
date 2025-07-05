@@ -308,17 +308,12 @@ const resetPassword = async (req, res, next) => {
   
 
 module.exports = {
-  //bioRegistration,
   authRegistration,
   verifyUserOtp,
   loginUser,
-  //verifyBioRegister,
-  //loginWithBio,
-  //loginWithAuth,
-  //verifyAuth,
+ 
   forgotPassword,
-  //verifyEmail,
-  //verifyOTP,
+  
   resetPassword,
 }
     
