@@ -38,10 +38,8 @@ const authRegistration = async (req, res) => {
       email,
       password,
       confirmPassword,
-      emailOTP,
       otp,
       isVerified: false,
-      emailOTPExpires: new Date(Date.now() + 10 * 60 * 1000),
       otpExpires: new Date(Date.now() + 10 * 60 * 1000),
       
     });
