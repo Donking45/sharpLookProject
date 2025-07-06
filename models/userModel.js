@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   preferences: Object,
   paymentMethods: [Object],
   otp: {type: String },
+  otpExpires: {type: Date},
   emailOTP: { type: String },
   emailOTPExpires: {type: Date },
   isSuspended: {type: Boolean, default: false},
