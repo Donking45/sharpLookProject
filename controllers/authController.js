@@ -106,12 +106,6 @@ const login = async (req, res) => {
       return res.status(404).json({ message: 'User account does not exist.' });
     }
 
-    // If user is not verified, prompt to verify
-    if (!user.isVerified) {
-      return res.status(401).json({
-        message: 'Your email is not verified. Please verify your email to proceed.'
-      });
-    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
