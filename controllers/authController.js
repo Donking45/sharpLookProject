@@ -292,7 +292,8 @@ const resetPassword = async (req, res) => {
     
     user.isOtpVerified = false; // Reset for next time
     user.isVerified = true;
-
+    user.password = createPassword;
+    
     await user.save();
 
     return res.status(200).json({ message: "Password reset successful" });
