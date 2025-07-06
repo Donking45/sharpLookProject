@@ -274,58 +274,37 @@ const verifyOTP = async (req, res, next) => {
 */
 
 
-const resetPassword = async (req, res, next) => {
+const resetPassword = async (req, res) => {
   try{
-    const {createPassword, confirmPassword } = req.body
-    
+    const { createPassword, confirmPassword } = req.body;
+  const token = req.headers.authorization?.split(" ")[1];
+  const { email } = jwt.verify(token, process.env.JWT_SECRET);
 
-  if(!createPassword || !confirmPassword){
-    return res.status(400).json({
-      message: "All fields are required"
-    });
+  const user = await User.findOne({ email });
+  if (!user || !user.isOtpVerified) {
+    return res.status(400).json({ message: "OTP not verified or user not found" });
   }
 
-  if (createPassword !== confirmPassword){
-    return res.status(400).json({
-      message: 'Passwords do not match'
-    })
-  }
-  
-
-  const user = await User.findOne({email:email.toLowerCase()})
-
-  if (!user){
-    return res.status(404).json({
-      message:'User not found'
-    })
-  }
-
-  if(!user.isOtpVerified) {
-    return res.status(400).json({ message:"Please verify OTP before resetting password"})
+  if (createPassword !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords do not match" });
   }
 
   
-  user.password = createPassword;
-  user.isOtpVerified = false
-  user.isVerified = true
+  user.isOtpVerified = false;
   await user.save();
 
-  
-  return res.status(200).json({
-    status: 'Password reset successful'
-  })
-
-   } catch (error) {
+  res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
     console.error("Reset password error:", error);
     res.status(500).json({
       message:"Server error during password reset",
       error: error.message,
     });
   }   
-}
   
-  
+};
 
+  
 module.exports = {
   authRegistration,
   verifyUserOtp,
