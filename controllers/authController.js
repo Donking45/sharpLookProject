@@ -275,36 +275,38 @@ const verifyOTP = async (req, res, next) => {
 
 
 const resetPassword = async (req, res) => {
-  try{
-    const { createPassword, confirmPassword } = req.body;
-  const token = req.headers.authorization?.split(" ")[1];
-  const { email } = jwt.verify(token, process.env.JWT_SECRET);
+  try {
+    const { email, newPassword, confirmPassword } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user || !user.isOtpVerified) {
-    return res.status(400).json({ message: "OTP not verified or user not found" });
-  }
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
-  if (createPassword !== confirmPassword) {
-    return res.status(400).json({ message: "Passwords do not match" });
-  }
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-  
-  user.isOtpVerified = false;
-  await user.save();
+    if (!user.isOtpVerified) {
+      return res.status(403).json({ message: "OTP verification required before password reset" });
+    }
 
-  res.status(200).json({ message: "Password reset successful" });
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 12);
+    user.isOtpVerified = false; // Reset for next time
+    user.isVerified = true;
+
+    await user.save();
+
+    return res.status(200).json({ message: "Password reset successful" });
   } catch (error) {
     console.error("Reset password error:", error);
-    res.status(500).json({
-      message:"Server error during password reset",
-      error: error.message,
-    });
-  }   
-  
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
-  
+
 module.exports = {
   authRegistration,
   verifyUserOtp,
