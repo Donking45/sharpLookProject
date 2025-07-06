@@ -221,7 +221,7 @@ const forgotPassword = async (req, res, next) => {
       message: 'Server error during email verification.'
     })
   }
-};
+};*/
 
 
 const verifyOTP = async (req, res, next) => {
@@ -244,7 +244,7 @@ const verifyOTP = async (req, res, next) => {
 
 
     // Check if OTP is invalid or expired
-    if (!user.otp || user.otp !== otp || user.otpExpires < Date.now()) {
+    if (!user.emailOTP || user.emailOTP !== otp || user.emailOTPExpires < Date.now()) {
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
@@ -256,8 +256,8 @@ const verifyOTP = async (req, res, next) => {
 
 
     // Whether for email verification or password reset, clear OTP after success
-    user.otp = undefined;
-    user.otpExpires = undefined;
+    user.emailOTP = undefined;
+    user.emailOTPExpires = undefined;
     user.isOtpVerified = true;
     await user.save();
 
@@ -271,7 +271,7 @@ const verifyOTP = async (req, res, next) => {
     return next(error);
   }
 };
-*/
+
 
 
 const resetPassword = async (req, res) => {
@@ -312,6 +312,7 @@ module.exports = {
   verifyUserOtp,
   loginUser,
   forgotPassword,
+  verifyOTP,
   resetPassword,
 }
     
