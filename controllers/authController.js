@@ -240,14 +240,19 @@ const verifyOTP = async (req, res, next) => {
 
     console.log("Received OTP:", otp);
     console.log("Stored OTP:", user.otp);
-    console.log("Expires At:", new Date(user.otpExpires), "| Now:", new Date());
+    console.log("Current time:", Date.now(), "| OTP Expiry:", user.otpExpires);
 
-    if (!user.otp || String(user.otp) !== String(otp)) {
+    if (!user.otp || String(user.otp).trim() !== String(otp).trim()) {
       return res.status(400).json({ message: 'Incorrect OTP' });
     }
 
     if (user.otpExpires < Date.now()) {
       return res.status(400).json({ message: 'OTP expired' });
+    }
+
+    // If user not verified yet → this is email verification
+    if (!user.isOtpVerified) {
+      user.isOtpVerified = true;
     }
 
     user.isOtpVerified = true;
@@ -260,7 +265,9 @@ const verifyOTP = async (req, res, next) => {
 
   } catch (error) {
     console.error('verifyOTP error:', error);
-    return next(error);
+    return res.status(500).json({
+      message: 'Server error during OTP verification'
+    });
   }
 };
 
