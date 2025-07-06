@@ -19,7 +19,7 @@ router.post('/auth/register', (req, res) => {
 router.post('/auth/verify-otp', verifyUserOtp)
 router.post('/auth/login', loginUser)
 router.post('/auth/forgot-password', forgotPassword);
-router.post('/auth/verify-otp', verifyOTP)
+router.post('/auth/verify-reset-otp', verifyOTP)
 router.patch('/auth/reset-password', resetPassword);
 //router.Patch('/profile', updateProfile)
 

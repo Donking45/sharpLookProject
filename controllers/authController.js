@@ -227,47 +227,39 @@ const verifyOTP = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
 
-    if(!email || !otp) {
+    if (!email || !otp) {
       return res.status(400).json({
-        message: 'Email and OTP are required'
-      })
+        message: 'Email and OTP are required',
+      });
     }
 
-
-    const user = await User.findOne({ email:email.toLowerCase()});
-
-
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
-
-    // Check if OTP is invalid or expired
-    if (!user.otp || user.otp !== otp || user.otpExpires < Date.now()) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    if (
+      !user.otp ||
+      String(user.otp).trim() !== String(otp).trim()
+    ) {
+      return res.status(400).json({ message: 'Incorrect OTP' });
     }
 
-
-    // If user not verified yet → this is email verification
-    if (!user.isOtpVerified) {
-      user.isOtpVerified = true;
+    if (!user.otpExpires || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: 'OTP expired' });
     }
 
-
-    // Whether for email verification or password reset, clear OTP after success
+    // OTP is correct and not expired
+    user.isOtpVerified = true;
     user.otp = undefined;
     user.otpExpires = undefined;
-    user.isOtpVerified = true;
+
     await user.save();
 
-
-
-    return res.status(200).json({ message: 'OTP verified successfully' });
-
-
+    return res.status(200).json({ message: 'OTP verified successfully. You can now reset your password.' });
   } catch (error) {
     console.error('verifyOTP error:', error);
-    return next(error);
+    return res.status(500).json({ message: 'Server error during OTP verification' });
   }
 };
 
