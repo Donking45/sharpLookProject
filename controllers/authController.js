@@ -244,7 +244,7 @@ const verifyOTP = async (req, res, next) => {
 
 
     // Check if OTP is invalid or expired
-    if (!user.emailOTP || user.emailOTP !== otp || user.emailOTPExpires < Date.now()) {
+    if (!user.otp || user.otp !== otp || user.otpExpires < Date.now()) {
       return res.status(400).json({ message: 'Invalid or expired OTP' });
     }
 
@@ -256,8 +256,8 @@ const verifyOTP = async (req, res, next) => {
 
 
     // Whether for email verification or password reset, clear OTP after success
-    user.emailOTP = undefined;
-    user.emailOTPExpires = undefined;
+    user.otp = undefined;
+    user.otpExpires = undefined;
     user.isOtpVerified = true;
     await user.save();
 
