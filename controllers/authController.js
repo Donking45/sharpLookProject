@@ -36,12 +36,7 @@ const authRegistration = async (req, res) => {
   
     const newUser = new User({
       email,
-      password,
-      confirmPassword,
-      otp,
-      isVerified: false,
-      otpExpires: new Date(Date.now() + 10 * 60 * 1000),
-      
+      password
     });
 
     await newUser.save();
