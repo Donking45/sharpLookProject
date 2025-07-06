@@ -242,16 +242,11 @@ const verifyOTP = async (req, res, next) => {
     console.log("Stored OTP:", user.otp);
     console.log("Current time:", Date.now(), "| OTP Expiry:", user.otpExpires);
 
-    if (!user.otp || String(user.otp).trim() !== String(otp).trim()) {
-      return res.status(400).json({ message: 'Incorrect OTP' });
-    }
-
-    if (user.otpExpires < Date.now()) {
-      return res.status(400).json({ message: 'OTP expired' });
+    if (!user.otp || user.otp !== otp || user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
     
-
     user.isOtpVerified = true;
     user.otp = undefined;
     user.otpExpires = undefined;
