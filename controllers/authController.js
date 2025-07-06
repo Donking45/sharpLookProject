@@ -276,9 +276,9 @@ const verifyOTP = async (req, res, next) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const { email, newPassword, confirmPassword } = req.body;
+    const { email, createPassword, confirmPassword } = req.body;
 
-    if (!email || !newPassword || !confirmPassword) {
+    if (!email || !createPassword || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -289,11 +289,11 @@ const resetPassword = async (req, res) => {
       return res.status(403).json({ message: "OTP verification required before password reset" });
     }
 
-    if (newPassword !== confirmPassword) {
+    if (createPassword !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    user.password = await bcrypt.hash(newPassword, 12);
+    
     user.isOtpVerified = false; // Reset for next time
     user.isVerified = true;
 
