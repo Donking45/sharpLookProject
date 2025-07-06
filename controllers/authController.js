@@ -276,16 +276,16 @@ const verifyOTP = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   try{
-    const {newPassword, confirmPassword } = req.body
+    const {createPassword, confirmPassword } = req.body
     
 
-  if(!newPassword || !confirmPassword){
+  if(!createPassword || !confirmPassword){
     return res.status(400).json({
       message: "All fields are required"
     });
   }
 
-  if (newPassword !== confirmPassword){
+  if (createPassword !== confirmPassword){
     return res.status(400).json({
       message: 'Passwords do not match'
     })
@@ -305,7 +305,7 @@ const resetPassword = async (req, res, next) => {
   }
 
   
-  user.password = newPassword;
+  user.password = createPassword;
   user.isOtpVerified = false
   user.isVerified = true
   await user.save();
