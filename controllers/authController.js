@@ -92,46 +92,63 @@ const verifyUserOtp = async (req, res) => {
 };
 
 
-
-const loginUser = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+      return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User account does not exist.' });
     }
 
+    // If user is not verified, prompt to verify
     if (!user.isVerified) {
-      return res.status(401).json({ message: "Please verify your account first" });
+      return res.status(401).json({
+        message: 'Your email is not verified. Please verify your email to proceed.'
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect password" });
+      return res.status(400).json({ message: 'Incorrect email or password.' });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // Generate JWT tokens
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN,
+      { expiresIn: '5h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN,
+      { expiresIn: '14d' }
+    );
 
     return res.status(200).json({
-      message: "Login successful",
-      token,
+      message: 'Login successful',
+      accessToken,
+      refreshToken,
       user: {
         id: user._id,
         email: user.email
       }
     });
-
   } catch (error) {
-    console.error("Login Error:", error.stack || error.message);
-    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    console.error('Login error:', error);
+    return res.status(500).json({
+      message: 'Server error during login',
+      error: error.message
+    });
   }
 };
- 
+
 
 
 const forgotPassword = async (req, res, next) => {
@@ -300,7 +317,7 @@ const resetPassword = async (req, res) => {
 module.exports = {
   authRegistration,
   verifyUserOtp,
-  loginUser,
+  login,
   forgotPassword,
   verifyOTP,
   resetPassword,

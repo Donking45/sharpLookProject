@@ -3,7 +3,7 @@ const router = express.Router();
 const { 
     authRegistration,
     verifyUserOtp,
-    loginUser,
+    login,
     forgotPassword,
     verifyOTP,
     resetPassword } = require('../controllers/authController');
@@ -17,7 +17,7 @@ router.post('/auth/register', (req, res) => {
 })
 
 router.post('/auth/verify-otp', verifyUserOtp)
-router.post('/auth/login', loginUser)
+router.post('/auth/login', login)
 router.post('/auth/forgot-password', forgotPassword);
 router.post('/auth/verify-reset-otp', verifyOTP)
 router.patch('/auth/reset-password', resetPassword);
