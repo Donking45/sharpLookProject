@@ -1,36 +1,50 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const vendorSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  phoneNumber: String,
-  password: String,
-  bio: String,
-  category: String, // e.g. makeup, nails, hair
-  location: {
-    type: { type: String, default: 'Point' },
-    coordinates: [Number]
-  },
-  documents: {
-    idCard: String,
-    certificate: String
-  },
-  portfolio: [String], // array of image URLs
-  availability: {
-    workDays: [String],
-    startTime: String,
-    endTime: String
-  },
-  serviceArea: {
-    radius: Number,
-    unit: String,
-    location: String
-  },
-  status: {
+  email: {
     type: String,
-    enum: ['pending_verification', 'active', 'banned'],
-    default: 'pending_verification'
-  }
+    required: true,
+    unique: true,
+    lowercase: true,
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false,
+  },
+  serviceType: {
+    type: String,
+    required: true,
+    enum: ['makeup', 'nail', 'hair', 'spa', 'barbering', 'other'], // You can customize
+  },
+  meansOfId: {
+    type: String, // Path or Cloudinary URL
+    required: true,
+  },
+  emailOTP: {
+    type: String,
+  },
+  emailOTPExpires: {
+    type: Date,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+}, { timestamps: true });
+
+
+//  Hash password before saving
+vendorSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
 });
+
+//  Compare entered password with hashed one
+vendorSchema.methods.correctPassword = async function (enteredPassword, storedPassword) {
+  return await bcrypt.compare(enteredPassword, storedPassword);
+};
 
 module.exports = mongoose.model('Vendor', vendorSchema);
