@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { upload } = require('../middlewares/authMiddleware'); // adjust path as needed
+const  upload  = require('../middlewares/multer'); // adjust path as needed
 const {  vendorRegistration,
   verifyVendorOtp,
   completeVendorProfile,
@@ -10,7 +10,7 @@ const {  vendorRegistration,
   resetPassword} = require('../controllers/vendorController');
 
 // Route to handle vendor registration with file upload (e.g. ID document)
-router.post('/register-vendor', vendorRegistration);
+router.post('/register-vendor', upload.single('idCard'), vendorRegistration);
 
 // Route to handle additional vendor profile completion
 router.post('/vendor/complete-profile', completeVendorProfile);

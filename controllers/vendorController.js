@@ -6,9 +6,19 @@ const Vendor = require('../models/vendorModel');
 
 const vendorRegistration = async (req, res) => {
   try {
-    const { email, createPassword, confirmPassword, serviceType } = req.body;
-    const idDocument = req.file; // from multer file upload
+    if (!req.body) {
+      return res.status(400).json({
+        message:"Request body is missing"
+      })
+    }
 
+    const email = req.body.email;
+    const password = req.body.createPassword
+    const confirmPassword = req.body.confirmPassword
+    const serviceType = req.body.serviceType
+
+    console.log("Request body:", req.body)
+    
     // Validate input
     if (!email || !createPassword || !confirmPassword || !serviceType || !idDocument) {
       return res.status(400).json({ message: "All fields are required" });
