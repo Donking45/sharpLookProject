@@ -1,5 +1,4 @@
-const multer = require('multer');
-const { upload } = require('../middlewares/authMiddleware'); // adjust path as needed
+const { sendEmail} = require('../utils/sendMail')
 const Vendor = require('../models/vendorModel');
 //const bcrypt = require('bcryptjs');
 
