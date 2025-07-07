@@ -61,8 +61,8 @@ const vendorRegistration = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Vendor Registration Error:", error);
-    res.status(500).json({ message: "Server error during registration" });
+    console.error("Vendor Registration Error:", error.stack || error.message);
+    res.status(500).json({ message: "Server error during registration", error: error.message });
   }
 };
 
