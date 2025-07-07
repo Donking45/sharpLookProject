@@ -18,7 +18,7 @@ const vendorSchema = new mongoose.Schema({
     required: true,
     enum: ['makeup', 'nail', 'hair', 'spa', 'barbering', 'other'], // You can customize
   },
-  meansOfId: {
+  idCard: {
     type: String, // Path or Cloudinary URL
     required: true,
   },
