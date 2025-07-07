@@ -6,75 +6,63 @@ const Vendor = require('../models/vendorModel');
 
 const vendorRegistration = async (req, res) => {
   try {
-    if (!req.body) {
-      return res.status(400).json({
-        message:"Request body is missing"
-      })
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ message: "Request body is missing" });
     }
 
-    const email = req.body.email;
-    const password = req.body.createPassword
-    const confirmPassword = req.body.confirmPassword
-    const serviceType = req.body.serviceType
+    const { email, password, confirmPassword, serviceType } = req.body;
 
-    console.log("Request body:", req.body)
-    
-    // Validate input
-    if (!email || !createPassword || !confirmPassword || !serviceType || !idDocument) {
+    if (!email || !password || !confirmPassword || !serviceType) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    if (!validEmail(email)) {
-      return res.status(400).json({ message: "Incorrect email format" });
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters long" });
     }
 
-    if (createPassword.length < 6) {
-      return res.status(400).json({ message: "Password should be minimum of 6 characters" });
-    }
-
-    if (createPassword !== confirmPassword) {
+    if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    const existingVendor= await Vendor.findOne({ email: email.toLowerCase() });
-    if (existingVendor) {
-      return res.status(400).json({ message: "User account already exists" });
+    if (!req.file) {
+      return res.status(400).json({ message: "Identification file (ID card) is required" });
     }
 
-    // Generate OTP
-    const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    const otpExpiry = Date.now() + 10 * 60 * 1000;
+    const existingVendor = await Vendor.findOne({ email: email.toLowerCase() });
+    if (existingVendor) {
+      return res.status(400).json({ message: "Vendor already exists with this email" });
+    }
 
-    // Save new vendor
+
+    const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
+
     const newVendor = new Vendor({
       email: email.toLowerCase(),
-      password: createPassword,
+      password,
       serviceType,
-      meansOfId: idDocument.path, // saved from multer
+      idCard: req.file.path, // assuming you store filepath in DB
       emailOTP,
-      emailOTPExpires: otpExpiry,
-      isVerified: false,
+      emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
     });
 
     await newVendor.save();
 
-    // Send Email OTP
     await sendEmail({
       email: newVendor.email,
       subject: "Email Verification OTP",
-      message: `Your email OTP is: ${emailOTP}`,
+      message: `Your OTP for verification is: ${emailOTP}`,
     });
 
     res.status(201).json({
-      message: "Vendor registered. OTP sent to email.",
+      message: "Vendor registered successfully. OTP sent to email.",
       vendorId: newVendor._id,
     });
-
   } catch (error) {
-    console.error("Vendor Registration Error:", error.stack || error.message);
+    console.error("Vendor registration error:", error);
     res.status(500).json({ message: "Server error during registration", error: error.message });
   }
 };
+
 
 const verifyVendorOtp = async (req, res) => {
   const { email, otp } = req.body;

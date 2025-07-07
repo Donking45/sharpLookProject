@@ -4,64 +4,50 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 
 
-
 const authRegistration = async (req, res) => {
+  
   try {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return res.status(400).json({ message: "Request body is missing" });
-    }
-
-    const { email, createPassword, confirmPassword, serviceType } = req.body;
-
-    if (!email || !createPassword || !confirmPassword || !serviceType) {
+    const { email, password, confirmPassword } = req.body;
+   
+    if (!email || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
-
-    if (createPassword.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters long" });
+    if (!validEmail(email)) {
+      return res.status(400).json({ message: "Incorrect email format" });
     }
-
-    if (createPassword !== confirmPassword) {
+    if (password.length < 6) {
+      return res.status(400).json({ message: "Password should be minimum of 6 characters" });
+    }
+    if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
-
-    if (!req.file) {
-      return res.status(400).json({ message: "Identification file (ID card) is required" });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User account already exists" });
     }
-
-    const existingVendor = await Vendor.findOne({ email: email.toLowerCase() });
-    if (existingVendor) {
-      return res.status(400).json({ message: "Vendor already exists with this email" });
-    }
-
-    const hashedPassword = await bcrypt.hash(createPassword, 12);
-
+    // Generate OTP
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
-
-    const newVendor = new Vendor({
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      serviceType,
-      idCard: req.file.path, // assuming you store filepath in DB
-      emailOTP,
-      emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
+ 
+    const newUser = new User({
+      email,
+      password
     });
-
-    await newVendor.save();
-
+    await newUser.save();
+   
+    // Send Email OTP
     await sendEmail({
-      email: newVendor.email,
+      email,
       subject: "Email Verification OTP",
-      message: `Your OTP for verification is: ${emailOTP}`,
+      message: `Your email OTP is: ${emailOTP}`,
     });
-
+   
     res.status(201).json({
-      message: "Vendor registered successfully. OTP sent to email.",
-      vendorId: newVendor._id,
+      message: "User registered. OTP sent to email.",
+      userId: newUser._id,
     });
   } catch (error) {
-    console.error("Vendor registration error:", error);
-    res.status(500).json({ message: "Server error during registration", error: error.message });
+    console.error("Registration error:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 
