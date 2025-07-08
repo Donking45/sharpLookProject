@@ -13,6 +13,8 @@ const vendorSchema = new mongoose.Schema({
     required: true,
     select: false,
   },
+  otp: {type: String },
+  otpExpires: {type: Date},
   serviceType: {
     type: String,
     required: true,
