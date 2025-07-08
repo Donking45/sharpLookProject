@@ -212,14 +212,12 @@ const forgotPassword = async (req, res, next) => {
     console.log("OTP:", otp)
     console.log("Email will be sent to:", email)
 
-    const message = `Your OTP for password reset is:${otp}`;
-
     await vendor.save({validateBeforeSave: false})
-  
+
     await sendEmail({
       email: vendor.email,
       subject: 'Password Reset OTP',
-      message: message
+      message: `Your OTP for password reset is:${otp}`
     })
 
     res.status(200).json({ message: "Please check your email"})
