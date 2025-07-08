@@ -1,6 +1,6 @@
 const { sendEmail} = require('../utils/sendMail')
 const Vendor = require('../models/vendorModel');
-//const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 
 
 const vendorRegistration = async (req, res) => {
