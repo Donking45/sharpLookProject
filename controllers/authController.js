@@ -29,6 +29,8 @@ const authRegistration = async (req, res) => {
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
  
     const newUser = new User({
+      firstName,
+      lastName,
       email,
       password,
       emailOTP,
