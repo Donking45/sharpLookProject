@@ -1,6 +1,7 @@
 const { sendEmail} = require('../utils/sendMail')
 const Vendor = require('../models/vendorModel');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 
 const vendorRegistration = async (req, res) => {
