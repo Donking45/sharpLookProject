@@ -60,10 +60,6 @@ const authorization = async (req, res, next)=>{
     }
 
 
-    if(vendor?.role !== "admin"){
-        return res.status(401).json({message: "Invalid Authorization"})
-    }
-
     req.vendor = vendor
 
     next()
