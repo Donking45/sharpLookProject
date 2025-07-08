@@ -39,7 +39,6 @@ const vendorRegistration = async (req, res) => {
       email: email.toLowerCase(),
       password,
       serviceType,
-      idCard: req.file.path, // assuming you store filepath in DB
       emailOTP,
       emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
     });

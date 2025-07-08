@@ -7,9 +7,9 @@ const User = require('../models/userModel');
 const authRegistration = async (req, res) => {
   
   try {
-    const { email, password, confirmPassword } = req.body;
+    const { firstName, lastName, email, password, confirmPassword } = req.body;
    
-    if (!email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
     if (!validEmail(email)) {
