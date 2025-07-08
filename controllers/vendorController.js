@@ -200,26 +200,26 @@ const forgotPassword = async (req, res, next) => {
     const vendor = await Vendor.findOne({email:email.toLowerCase()})
 
     if(!vendor){
-       return next(new ErrorResponse('Vendor not found',404))
+       return next(new ErrorResponse('User not found',404))
     }
 
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
     vendor.otp = otp;
     vendor.otpExpires = Date.now() + 10 * 60 * 1000
     //admin.otpVerifiedForReset = false;
-    
+
+
     await vendor.save({validateBeforeSave: false})
-    
-    const updatedVendor = await vendor.findOne({
-      email: email.toLowerCase()
-    })
-    console.log("OTP stored in DB:", updatedVendor.otp)
+
+    console.log("OTP:", otp)
     console.log("Email will be sent to:", email)
 
+    const message = `Your OTP for password reset is:${otp}`;
+  
     await sendEmail({
       email: vendor.email,
       subject: 'Password Reset OTP',
-      message: `Your OTP for password reset is:${otp}`
+      message: message
     })
 
     res.status(200).json({ message: "Please check your email"})
@@ -231,6 +231,7 @@ const forgotPassword = async (req, res, next) => {
   }
 
 }
+
 
 const verifyOTP = async (req, res, next) => {
   try {
