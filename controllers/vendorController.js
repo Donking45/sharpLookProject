@@ -191,11 +191,11 @@ const forgotPassword = async (req, res, next) => {
   try{
     const { email } = req.body
 
-    if(!email) {
-      res.status(400).json({
-        message: 'Email is required'
-      })
-    }
+    //if(!email) {
+      //res.status(400).json({
+       // message: 'Email is required'
+     // })
+   // }
 
     const vendor = await Vendor.findOne({email:email.toLowerCase()})
 
@@ -207,12 +207,11 @@ const forgotPassword = async (req, res, next) => {
     vendor.otp = otp;
     vendor.otpExpires = Date.now() + 10 * 60 * 1000
     //admin.otpVerifiedForReset = false;
-
+    
+    await vendor.save({validateBeforeSave: false})
 
     console.log("OTP:", otp)
     console.log("Email will be sent to:", email)
-
-    await vendor.save({validateBeforeSave: false})
 
     await sendEmail({
       email: vendor.email,
@@ -245,10 +244,11 @@ const verifyOTP = async (req, res, next) => {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
-    if (
-      !vendor.otp ||
-      String(vendor.otp).trim() !== String(otp).trim()
-    ) {
+    console.log("Stored OTP:", vendor.otp);
+    console.log("Received OTP:", otp);
+
+    if (!vendor.otp ||
+      String(vendor.otp).trim() !== String(otp).trim()) {
       return res.status(400).json({ message: 'Incorrect OTP' });
     }
 
@@ -269,8 +269,6 @@ const verifyOTP = async (req, res, next) => {
     return res.status(500).json({ message: 'Server error during OTP verification' });
   }
 };
-
-
 
 const resetPassword = async (req, res) => {
   try {
