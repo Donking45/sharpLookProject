@@ -34,6 +34,25 @@ const vendorSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
+const updateProfile = async (req, res) => {
+  const {id} = req.vendor;
+  try {
+    const updated = await User.findByIdAndUpdate(id, req.body, { new: true})
+    res.status(200).json({ updated });
+  } catch (err) {
+    res.status(500).json({message: err.message})
+  }
+};
+
+vendorSchema.virtual('confirmPassword')
+  .get(function (){
+    return this._confirmPassword
+  })
+  .set(function (value){
+    this._confirmPassword = value
+  })
+
+
 //  Hash password before saving
 vendorSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
