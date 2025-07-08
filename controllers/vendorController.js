@@ -191,11 +191,11 @@ const forgotPassword = async (req, res, next) => {
   try{
     const { email } = req.body
 
-    //if(!email) {
-      //res.status(400).json({
-       // message: 'Email is required'
-     // })
-   // }
+    if(!email) {
+      res.status(400).json({
+        message: 'Email is required'
+      })
+    }
 
     const vendor = await Vendor.findOne({email:email.toLowerCase()})
 
@@ -209,8 +209,11 @@ const forgotPassword = async (req, res, next) => {
     //admin.otpVerifiedForReset = false;
     
     await vendor.save({validateBeforeSave: false})
-
-    console.log("OTP:", otp)
+    
+    const updatedVendor = await vendor.findOne({
+      email: email.toLowerCase()
+    })
+    console.log("OTP stored in DB:", updatedVendor.otp)
     console.log("Email will be sent to:", email)
 
     await sendEmail({
