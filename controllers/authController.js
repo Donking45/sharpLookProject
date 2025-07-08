@@ -30,7 +30,9 @@ const authRegistration = async (req, res) => {
  
     const newUser = new User({
       email,
-      password
+      password,
+      emailOTP,
+      emailOTPExpires: Date.now() + 10 * 60 * 1000,
     });
     await newUser.save();
    
