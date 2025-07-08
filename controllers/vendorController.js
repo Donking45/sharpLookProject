@@ -245,7 +245,10 @@ const verifyOTP = async (req, res, next) => {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
-    if (!vendor.otp !== otp ){
+    if (
+      !vendor.otp ||
+      String(vendor.otp).trim() !== String(otp).trim()
+    ) {
       return res.status(400).json({ message: 'Incorrect OTP' });
     }
 
@@ -266,6 +269,7 @@ const verifyOTP = async (req, res, next) => {
     return res.status(500).json({ message: 'Server error during OTP verification' });
   }
 };
+
 
 
 const resetPassword = async (req, res) => {
