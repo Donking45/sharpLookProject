@@ -242,14 +242,15 @@ const verifyOTP = async (req, res, next) => {
       });
     }
 
-    const vendor = await Vendor.findOne({ email: email.toLowerCase() });
+    const vendor = await Vendor.findOne({ email: email.toLowerCase() })
+    .select('+otp +otpExpires');
+    
     if (!vendor) {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
     if (
-      !vendor.otp ||
-      String(vendor.otp).trim() !== String(otp).trim()
+      !vendor.otp || vendor.otp.trim() !== otp.trim()
     ) {
       return res.status(400).json({ message: 'Incorrect OTP' });
     }
