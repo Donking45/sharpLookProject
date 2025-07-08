@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require("../models/userModel")
+const Vendor = require("../models/vendorModel")
 
 
 
@@ -53,18 +53,18 @@ const authorization = async (req, res, next)=>{
         return res.status(401).json({message: "Please login!"})
     }
 
-    const user = await User.findById(decoded.id)
+    const vendor = await Vendor.findById(decoded.id)
 
-    if(!user){
-        return res.status(404).json({message: "User account does not exist"})
+    if(!vendor){
+        return res.status(404).json({message: "Vendor account does not exist"})
     }
 
 
-    if(user?.role !== "agent"){
+    if(vendor?.role !== "admin"){
         return res.status(401).json({message: "Invalid Authorization"})
     }
 
-    req.user = user
+    req.vendor = vendor
 
     next()
 }
