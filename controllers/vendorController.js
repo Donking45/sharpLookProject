@@ -23,10 +23,6 @@ const vendorRegistration = async (req, res) => {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Identification file (ID card) is required" });
-    }
-
     const existingVendor = await Vendor.findOne({ email: email.toLowerCase() });
     if (existingVendor) {
       return res.status(400).json({ message: "Vendor already exists with this email" });
