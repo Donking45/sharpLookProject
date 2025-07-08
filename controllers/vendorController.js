@@ -296,9 +296,9 @@ const resetPassword = async (req, res) => {
     }
 
     
-    user.isOtpVerified = false; // Reset for next time
-    user.isVerified = true;
-    user.password = createPassword;
+    vendor.isOtpVerified = false; // Reset for next time
+    vendor.isVerified = true;
+    vendor.password = createPassword;
     
     await vendor.save();
 
