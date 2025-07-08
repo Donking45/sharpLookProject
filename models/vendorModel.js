@@ -20,7 +20,7 @@ const vendorSchema = new mongoose.Schema({
   },
   idCard: {
     type: String, // Path or Cloudinary URL
-    required: true,
+    required: false,
   },
   emailOTP: {
     type: String,
