@@ -209,12 +209,12 @@ const forgotPassword = async (req, res, next) => {
     //admin.otpVerifiedForReset = false;
 
 
-    await vendor.save({validateBeforeSave: false})
-
     console.log("OTP:", otp)
     console.log("Email will be sent to:", email)
 
     const message = `Your OTP for password reset is:${otp}`;
+
+    await vendor.save({validateBeforeSave: false})
   
     await sendEmail({
       email: vendor.email,
