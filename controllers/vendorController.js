@@ -242,13 +242,10 @@ const verifyOTP = async (req, res, next) => {
 
     const vendor = await Vendor.findOne({ email: email.toLowerCase() });
     if (!vendor) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'Vendor not found' });
     }
 
-    if (
-      !vendor.otp ||
-      String(vendor.otp).trim() !== String(otp).trim()
-    ) {
+    if (!vendor.otp !== otp ){
       return res.status(400).json({ message: 'Incorrect OTP' });
     }
 
