@@ -217,7 +217,7 @@ const forgotPassword = async (req, res, next) => {
     const message = `Your OTP for password reset is:${otp}`;
   
     await sendEmail({
-      email: user.email,
+      email: vendor.email,
       subject: 'Password Reset OTP',
       message: message
     })
