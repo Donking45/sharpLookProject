@@ -81,7 +81,7 @@ const verifyUserOtp = async (req, res) => {
 
 const resendOTP = async (req, res) =>{
   try {
-    const {emai} = req.body;
+    const {email} = req.body;
 
     if (!email) {
       return res.status(400).json({
