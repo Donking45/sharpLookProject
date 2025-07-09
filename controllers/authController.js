@@ -289,8 +289,7 @@ const verifyOTP = async (req, res, next) => {
 
     // OTP is correct and not expired
     user.isOtpVerified = true;
-    user.otp = undefined;
-    user.otpExpires = undefined;
+    
 
     await user.save();
 
