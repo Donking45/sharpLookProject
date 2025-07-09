@@ -79,6 +79,45 @@ const verifyUserOtp = async (req, res) => {
   res.status(200).json({ message: "Account verified successfully" });
 };
 
+const resendOTP = async (req, res) =>{
+  try {
+    const {emai} = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: 'Email is required'
+      })
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase()})
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      })
+    }
+
+    // Generate a new OTP
+    const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    user.otp = newOTP;
+    user.otpExpires = Date.now() + 10 * 60 * 1000;
+
+    await user.save({
+      email: user.email,
+      subject: 'Resend OTP Verification',
+      message: `Your new OTP IS${newOTP}`
+    })
+
+    return res.status(200).json({
+      message: 'New OTP sent to your email'
+    });
+  } catch(error) {
+    console.error('Resend OTP error:', error)
+    return res.status(500).json({
+      message: 'Server error during OTP resend'
+    })
+  }
+}
+
 
 const login = async (req, res) => {
   try {
@@ -300,6 +339,7 @@ const resetPassword = async (req, res) => {
 module.exports = {
   authRegistration,
   verifyUserOtp,
+  resendOTP,
   login,
   forgotPassword,
   verifyOTP,

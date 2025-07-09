@@ -3,6 +3,7 @@ const router = express.Router();
 const { 
     authRegistration,
     verifyUserOtp,
+    resendOTP,
     login,
     forgotPassword,
     verifyOTP,
@@ -17,6 +18,7 @@ router.post('/auth/register', (req, res) => {
 })
 
 router.post('/auth/verify-otp', verifyUserOtp)
+router.post('/auth/resnd-otp', resendOTP)
 router.post('/auth/login', login)
 router.post('/auth/forgot-password', forgotPassword);
 router.post('/auth/verify-reset-otp', verifyOTP)

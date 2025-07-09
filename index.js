@@ -22,7 +22,6 @@ routes.forEach(route => {
 });
 
 
-
 const PORT = process.env.PORT || 7001
 
 const MONGO_URL = process.env.MONGO_URL;

@@ -1,6 +1,8 @@
 const authRoute = require('./authRoute')
 const vendorRoute = require('./vendorRoute')
 const bookingRoute = require('./bookingRoute')
+const paystackRoute = require('./paystackRoute')
+const clientRoute = require('./clientRoute')
 
 
 
@@ -8,7 +10,9 @@ const bookingRoute = require('./bookingRoute')
 const routes = [
     authRoute,
     vendorRoute,
-    bookingRoute
+    bookingRoute,
+    paystackRoute,
+    clientRoute
 ]
 
 module.exports = routes

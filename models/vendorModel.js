@@ -1,7 +1,15 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const geocoder = require('../utils/geocoder')
 
 const vendorSchema = new mongoose.Schema({
+  rating:{
+    type: Number,
+    default: 0
+  },
+  profileImage:{
+    type:String
+  },
   email: {
     type: String,
     required: true,
@@ -31,9 +39,37 @@ const vendorSchema = new mongoose.Schema({
     default: false,
   },
   isOtpVerified: {type: Boolean, default: false },
+  address: {
+    type: String,
+    required: [true, 'Please add an address']
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ['Point']
+    },
+    coordinates: {
+      type: [Number],
+      index: '2dsphere'
+    },
+    formattedAddress: String
+  }
 }, { timestamps: true });
 
+// Geocode & create location
+vendorSchema.pre('save', async function(next) {
+  const loc = await geocoder.geocode(this.address);
+  this.location = {
+    type: 'Point',
+    coordinates: [loc[0].longitude, loc[0].latitude],
+    formattedAddress: loc[0].formattedAddress
+  }
 
+  // Do not save address
+  this.address = undefined;
+  next();
+
+})
 const updateProfile = async (req, res) => {
   const {id} = req.vendor;
   try {
@@ -51,6 +87,7 @@ vendorSchema.virtual('confirmPassword')
   .set(function (value){
     this._confirmPassword = value
   })
+
 
 
 //  Hash password before saving

@@ -84,48 +84,46 @@ const verifyVendorOtp = async (req, res) => {
 
 const completeVendorProfile = async (req, res) => {
   try {
-    const vendorId = req.vendor.id
+    const vendorId = req.user.id;
+
     const {
       businessName,
       businessDescription,
-      location,
+      address,
       businessRegNumber,
-      portfolioLink
+      portfolioLink,
     } = req.body;
 
-    // Validate fields
-    if (!businessName || !businessDescription || !location || !businessRegNumber || !portfolioLink) {
+    if (!businessName || !businessDescription || !address || !businessRegNumber || !portfolioLink) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
-    // Fetch vendor
     const vendor = await Vendor.findById(vendorId);
-    if (!vendor) {
-      return res.status(404).json({ message: 'Vendor not found.' });
+    if (!vendor) return res.status(404).json({ message: 'Vendor not found.' });
+
+    //  Geocode the address
+    const loc = await geocoder.geocode(address);
+    if (!loc.length) {
+      return res.status(400).json({ message: 'Invalid address' });
     }
 
-    if (!vendor.isVerified) {
-      return res.status(403).json({ message: 'Email verification required before completing profile.' });
-    }
-
-    // Update profile
+    //  Set profile and location
     vendor.businessName = businessName;
     vendor.businessDescription = businessDescription;
-    vendor.location = location;
+    vendor.address = address;
     vendor.businessRegNumber = businessRegNumber;
     vendor.portfolioLink = portfolioLink;
+    vendor.location = {
+      type: 'Point',
+      coordinates: [loc[0].longitude, loc[0].latitude],
+      formattedAddress: loc[0].formattedAddress,
+    };
 
     await vendor.save();
 
     res.status(200).json({
-      message: 'Vendor profile completed successfully.',
-      vendorProfile: {
-        businessName: vendor.businessName,
-        businessDescription: vendor.businessDescription,
-        location: vendor.location,
-        businessRegNumber: vendor.businessRegNumber,
-        portfolioLink: vendor.portfolioLink,
-      },
+      message: 'Vendor profile completed successfully',
+      vendor,
     });
   } catch (error) {
     console.error('Complete profile error:', error);
@@ -309,7 +307,67 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const getVendors = async (req, res, next) => {
+  try{
+    const vendors = await Vendor.find();
 
+    return res.status(200).json({
+      success: true,
+      count: vendors.length,
+      data: vendors
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Servererror'})
+  }
+}
+
+const addVendors = async (req, res, next) => {
+  try{
+    const vendor = await Vendor.create(req.body);
+
+    return res.status(200).json({
+      success: true,
+      data: vendor
+    })
+  } catch (err) {
+    console.error(err);
+    if(err.code === 404) {
+      return res.status(400).json({
+        error: 'This vendor already exist'
+      })
+    }
+    res.status(500).json({ error: 'Servererror'})
+  }
+}
+
+// find nearest vendor
+const find_vendor = async(req, res) =>{
+  try{
+    const latitiude = req.body.latitiude;
+    const longitude = req.body.longitude;
+
+    const vendor_data = await Vendor.aggregate([
+      {
+        $geoNear:{
+           near: {type:"Point", coordinates:[parseFloat(longitude), parseFloat(latitiude)]},
+           key:"location",
+           maxDistance:parseFloat(1000)*1609,
+           distanceField:"dist.calculated",
+           spherical:true
+        }
+      }
+    ])
+    
+    res.status(200).send({
+      success:true, msg:"Vendor details", data:vendor_data
+    })
+  } catch(error) {
+    res.status(400).send({
+      success:false, msg:error.message
+    })
+  }
+}
 module.exports = {
   vendorRegistration,
   verifyVendorOtp,
@@ -317,5 +375,8 @@ module.exports = {
   login,
   forgotPassword,
   verifyOTP,
-  resetPassword
+  resetPassword,
+  find_vendor,
+  getVendors,
+  addVendors
 };

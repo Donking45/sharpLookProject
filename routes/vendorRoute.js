@@ -7,7 +7,10 @@ const {  vendorRegistration,
   login,
   forgotPassword,
   verifyOTP,
-  resetPassword} = require('../controllers/vendorController');
+  resetPassword,
+  find_vendor, 
+  getVendors,
+  addVendors} = require('../controllers/vendorController');
   const { authorization } = require('../middlewares/authMiddleware')
 
 // Route to handle vendor registration with file upload (e.g. ID document)
@@ -20,5 +23,8 @@ router.post('/vendor/login', login)
 router.post('/vendor/forgot-password', forgotPassword);
 router.post('/vendor/verify-reset-otp', verifyOTP)
 router.patch('/vendor/reset-password', resetPassword);
+router.get('/vendor/getVendors', getVendors);
+router.post('/vendor/addVendors', addVendors);
+router.post('/find-nearest-vendor', find_vendor)
 
 module.exports = router;
