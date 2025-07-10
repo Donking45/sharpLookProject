@@ -18,7 +18,7 @@ const {  vendorRegistration,
 router.post('/register-vendor',  vendorRegistration);
 
 // Route to handle additional vendor profile completion
-router.get('/vendor/:vendorId/complete-profile',  completeVendorProfile);
+router.get('/vendor/complete-profile', authorization,  completeVendorProfile);
 router.post('/vendor/resend-otp', resendVendorOTP)
 router.post('/vendor/verify-otp', verifyVendorOtp)
 router.post('/vendor/login', login)
