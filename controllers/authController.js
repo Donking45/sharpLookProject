@@ -110,7 +110,7 @@ const verifyUserOtp = async (req, res) => {
   const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  if (!user.emailOTP || String(User.emailOTP).trim() !== String(otp).trim() ) {
+  if (!user.emailOTP || otp.trim() !== user.emailOTP.trim() ) {
     return res.status(400).json({ message: "Incorrect OTP" });
   }
 
@@ -118,7 +118,7 @@ const verifyUserOtp = async (req, res) => {
     return res.status(400).json({ message: "OTP expired" });
   }
 
-  user.isOtpVerified = true;
+  user.isVerified = true;
   user.emailOTP = undefined;
   user.emailOTPExpires = undefined;
 
