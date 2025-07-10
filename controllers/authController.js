@@ -118,7 +118,7 @@ const verifyUserOtp = async (req, res) => {
     return res.status(400).json({ message: "OTP expired" });
   }
 
-  user.isVerified = true;
+  user.isOtpVerified = true;
   user.emailOTP = undefined;
   user.emailOTPExpires = undefined;
 
