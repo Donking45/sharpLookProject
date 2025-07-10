@@ -58,6 +58,47 @@ const vendorRegistration = async (req, res) => {
   }
 };
 
+const resendVendorOTP = async (req, res) =>{
+  try {
+    const {email} = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        message: 'Email is required'
+      })
+    }
+
+    const vendor = await Vendor.findOne({ email: email.toLowerCase()})
+    if (!vendor) {
+      return res.status(404).json({
+        message: 'Vendor not found'
+      })
+    }
+
+    // Generate a new OTP
+    const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    vendor.emailOTP = newOTP;
+    vendor.emailOTPExpires = Date.now() + 10 * 60 * 1000;
+
+    await vendorRegistration.save({ validateBeforeSave: false})
+
+    await sendEmail({
+      email: vendor.email,
+      subject: 'Resend Email Verification OTP',
+      message: `Your new OTP is: ${newOTP}`
+    })
+
+    return res.status(200).json({
+      message: 'New OTP sent to your email'
+    });
+  } catch(error) {
+    console.error('Resend OTP error:', error)
+    return res.status(500).json({
+      message: 'Server error during OTP resend'
+    })
+  }
+}
+
 
 const verifyVendorOtp = async (req, res) => {
   const { email, otp } = req.body;
@@ -65,9 +106,13 @@ const verifyVendorOtp = async (req, res) => {
   const vendor = await Vendor.findOne({ email });
   if (!vendor) return res.status(404).json({ message: "User not found" });
 
-  if (vendor.emailOTP !== otp) {
+  if (!vendor.emailOTP || otp.trim() !== vendor.emailOTP.trim() ) {
     return res.status(400).json({ message: "Incorrect OTP" });
   }
+
+  //if (vendor.emailOTP !== otp) {
+    //return res.status(400).json({ message: "Incorrect OTP" });
+ // }
 
   if (vendor.emailOTPExpires < Date.now()) {
     return res.status(400).json({ message: "OTP expired" });
@@ -84,7 +129,7 @@ const verifyVendorOtp = async (req, res) => {
 
 const completeVendorProfile = async (req, res) => {
   try {
-    const vendorId = req.user.id;
+    const vendorId = req.vendor.id;
 
     const {
       businessName,
@@ -337,7 +382,7 @@ const addVendors = async (req, res, next) => {
         error: 'This vendor already exist'
       })
     }
-    res.status(500).json({ error: 'Servererror'})
+    res.status(500).json({ error: 'Server Error'})
   }
 }
 
@@ -374,6 +419,7 @@ module.exports = {
   completeVendorProfile,
   login,
   forgotPassword,
+  resendVendorOTP,
   verifyOTP,
   resetPassword,
   find_vendor,

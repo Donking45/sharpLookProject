@@ -6,6 +6,7 @@ const {  vendorRegistration,
   completeVendorProfile,
   login,
   forgotPassword,
+  resendVendorOTP,
   verifyOTP,
   resetPassword,
   find_vendor, 
@@ -18,6 +19,7 @@ router.post('/register-vendor',  vendorRegistration);
 
 // Route to handle additional vendor profile completion
 router.get('/vendor/:vendorId/complete-profile',  completeVendorProfile);
+router.post('/vendor/resend-otp', resendVendorOTP)
 router.post('/vendor/verify-otp', verifyVendorOtp)
 router.post('/vendor/login', login)
 router.post('/vendor/forgot-password', forgotPassword);
