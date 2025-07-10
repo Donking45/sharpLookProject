@@ -75,13 +75,15 @@ const resendOTP = async (req, res) =>{
 
     // Generate a new OTP
     const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    user.otp = newOTP;
-    user.otpExpires = Date.now() + 10 * 60 * 1000;
+    user.emailOTP = newOTP;
+    user.emailOTPExpires = Date.now() + 10 * 60 * 1000;
 
-    await user.save({
+    await user.save({ validateBeforeSave: false})
+
+    await sendEmail({
       email: user.email,
-      subject: 'Resend OTP Verification',
-      message: `Your new OTP IS${newOTP}`
+      subject: 'Resend Email Verification OTP',
+      message: `Your new OTP is: ${newOTP}`
     })
 
     return res.status(200).json({
