@@ -56,29 +56,6 @@ const authRegistration = async (req, res) => {
 };
 
 
-const verifyUserOtp = async (req, res) => {
-  const { email, otp } = req.body;
-
-  const user = await User.findOne({ email });
-  if (!user) return res.status(404).json({ message: "User not found" });
-
-  if (user.emailOTP !== otp) {
-    return res.status(400).json({ message: "Incorrect OTP" });
-  }
-
-  if (user.emailOTPExpires < Date.now()) {
-    return res.status(400).json({ message: "OTP expired" });
-  }
-
-  user.isVerified = true;
-  user.emailOTP = undefined;
-  user.emailOTPExpires = undefined;
-
-  await user.save();
-
-  res.status(200).json({ message: "Account verified successfully" });
-};
-
 const resendOTP = async (req, res) =>{
   try {
     const {email} = req.body;
@@ -117,6 +94,45 @@ const resendOTP = async (req, res) =>{
     })
   }
 }
+
+const verifyUserOtp = async (req, res) => {
+  try{
+    const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return res.status(400).json({
+      message: 'Email and OTP are required'
+    })
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  if (!user.emailOTP || String(User.emailOTP).trim() !== String(otp).trim()) {
+    return res.status(400).json({ message: "Incorrect OTP" });
+  }
+
+  if (!user.emailOTPExpires || user.emailOTPExpires < Date.now()) {
+    return res.status(400).json({ message: "OTP expired" });
+  }
+
+  user.isVerified = true;
+  //user.emailOTP = undefined;
+  //user.emailOTPExpires = undefined;
+
+  await user.save();
+
+  res.status(200).json({
+     message: "Account verified successfully" });
+  } catch(error) {
+    console.error('Email verification error:', error)
+    return res.status(500).json({
+      message: 'Server error during email verification'
+    })
+  }
+}; 
+  
+
 
 
 const login = async (req, res) => {
@@ -289,6 +305,8 @@ const verifyOTP = async (req, res, next) => {
 
     // OTP is correct and not expired
     user.isOtpVerified = true;
+    user.otp = undefined;
+    user.otpExpires = undefined;
     
 
     await user.save();
