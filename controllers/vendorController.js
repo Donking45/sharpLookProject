@@ -129,7 +129,7 @@ const verifyVendorOtp = async (req, res) => {
 
 const completeVendorProfile = async (req, res) => {
   try {
-    const vendorId = req.vendor.id;
+    const vendorId = req.vendor._id;
 
     const {
       businessName,
