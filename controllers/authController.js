@@ -110,7 +110,7 @@ const verifyUserOtp = async (req, res) => {
   const user = await User.findOne({ email: email.toLowerCase() });
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  if (!user.emailOTP || User.emailOTP !== otp ) {
+  if (!user.emailOTP || String(User.emailOTP).trim() !== String(otp).trim() ) {
     return res.status(400).json({ message: "Incorrect OTP" });
   }
 
@@ -119,8 +119,8 @@ const verifyUserOtp = async (req, res) => {
   }
 
   user.isVerified = true;
-  //user.emailOTP = undefined;
-  //user.emailOTPExpires = undefined;
+  user.emailOTP = undefined;
+  user.emailOTPExpires = undefined;
 
   await user.save();
 
