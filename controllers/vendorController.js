@@ -352,39 +352,63 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const getVendors = async (req, res, next) => {
-  try{
-    const vendors = await Vendor.find();
 
-    return res.status(200).json({
-      success: true,
-      count: vendors.length,
-      data: vendors
-    });
+
+// Get All Vendors
+const getAllVendors = async (req, res) => {
+  try {
+    const vendors = await Vendor.find().select('-password');
+    res.status(200).json({ vendors });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Servererror'})
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
-}
+};
 
-const addVendors = async (req, res, next) => {
-  try{
-    const vendor = await Vendor.create(req.body);
-
-    return res.status(200).json({
-      success: true,
-      data: vendor
-    })
-  } catch (err) {
-    console.error(err);
-    if(err.code === 404) {
-      return res.status(400).json({
-        error: 'This vendor already exist'
-      })
+// Get Single Vendor
+const getVendorById = async (req, res) => {
+  try {
+    const vendor = await Vendor.findById(req.params.id).select('-password');
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found' });
     }
-    res.status(500).json({ error: 'Server Error'})
+    res.status(200).json({ vendor });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
-}
+};
+
+// Update Vendor Profile
+const updateVendor = async (req, res) => {
+  try {
+    const vendor = await Vendor.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found' });
+    }
+
+    res.status(200).json({ message: 'Vendor updated successfully', vendor });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Delete Vendor
+ const deleteVendor = async (req, res) => {
+  try {
+    const vendor = await Vendor.findByIdAndDelete(req.params.id);
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found' });
+    }
+    res.status(200).json({ message: 'Vendor deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
 
 // find nearest vendor
 const find_vendor = async(req, res) =>{
@@ -423,6 +447,8 @@ module.exports = {
   verifyOTP,
   resetPassword,
   find_vendor,
-  getVendors,
-  addVendors
+  getAllVendors,
+  getVendorById,
+  updateVendor,
+  deleteVendor
 };

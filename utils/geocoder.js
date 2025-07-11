@@ -1,13 +1,25 @@
-const NodeGeocoder = require('node-geocoder');
+const express = require('express');
+const axios = require('axios');
+const app = express();
 
-const options = {
-    provider: process.env.GEOCODER_PROVIDER,
+app.get('/geocode', async (req, res) => {
+  const address = req.query.address || 'Lagos, Nigeria';
+  try {
+    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+      params: {
+        q: address,
+        format: 'json',
+        limit: 1
+      },
+      headers: {
+        'User-Agent': 'MyApp/1.0 (your@email)'
+      }
+    });
 
-    httpAdapter: 'https',
-    apiKey: process.env.GEOCODER_API_KEY,
-    formatter: null
-};
+    res.json(response.data[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch coordinates' });
+  }
+});
 
-const geocoder = NodeGeocoder(options);
-
-module.exports=geocoder;
+app.listen(3000, () => console.log('Server running on port 3000'));

@@ -1,9 +1,20 @@
-const express = require('express')
+const express = require('express');
 const router = express.Router();
-const { createBooking, getBookHistory }= require('../controllers/bookingController');
+const {
+  createBookings,
+  getClientBookings,
+  getVendorBookings
+} = require('../controllers/bookingController');
 
+const { authorization } = require('../middlewares/authMiddleware');
 
-router.post('/create', createBooking)
-router.get('/history', getBookHistory)
+// Create booking
+router.post('/create', authorization, createBookings);
 
-module.exports = router
+// Get client bookings
+router.get('/client', authorization, getClientBookings);
+
+// Get vendor bookings
+router.get('/vendor',  getVendorBookings);
+
+module.exports = router;

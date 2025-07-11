@@ -1,55 +1,37 @@
-const Paystack = require('node-paystack');
-const Payment = require('../models/paystackModel')
-const https = require('https');
+const axios = require('axios');
+const Order = require('../models/orderModel');
 
-const initializePayment = async (req, res) => {
-  const params = JSON.stringify({
-    email: req.body.email,
-    amount: req.body.amount * 100, 
-  });
+const initiateProductPayment = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const order = await Order.findById(orderId).populate('user');
 
-  const options = {
-    hostname: 'api.paystack.co',
-    port: 443,
-    path: '/transaction/initialize',
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`, 
-      'Content-Type': 'application/json',
-    },
-  };
-
-  const request = https.request(options, (response) => {
-    let data = '';
-
-    response.on('data', (chunk) => {
-      data += chunk;
-    });
-
-    response.on('end', () => {
-      try {
-        const parsedData = JSON.parse(data);
-        if (parsedData.status) {
-          res.status(200).json(parsedData);
-        } else {
-          res.status(400).json({ message: 'Payment initialization failed', data: parsedData });
+    const response = await axios.post('https://api.paystack.co/transaction/initialize',
+      {
+        email: order.user.email,
+        amount: order.totalAmount * 100, // in kobo
+        metadata: {
+          orderId: order._id.toString(),
+          custom_fields: [
+            {
+              display_name: "Customer ID",
+              value: order.user._id.toString()
+            }
+          ]
         }
-      } catch (err) {
-        console.error('Parsing error:', err);
-        res.status(500).json({ message: 'Server error during payment initialization' });
-      }
-    });
-  });
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-  request.on('error', (error) => {
-    console.error('HTTPS error:', error);
-    res.status(500).json({ message: 'Payment request failed', error: error.message });
-  });
-
-  request.write(params);
-  request.end();
+    res.status(200).json({ message: 'Payment initiated', data: response.data.data });
+  } catch (error) {
+    res.status(500).json({ message: 'Payment initialization failed', error: error.message });
+  }
 };
 
-module.exports = { initializePayment };
 
-
+module.exports =  {initiateProductPayment};

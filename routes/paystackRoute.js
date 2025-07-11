@@ -1,7 +1,11 @@
+// routes/productRoute.js
 const express = require('express');
 const router = express.Router();
-const { initializePayment } = require('../controllers/paystackController');
+const { initiateProductPayment } = require('../controllers/paystackController');
+const { authorization} = require('../middlewares/authMiddleware');
 
-router.post('/paystack/initiatePayment', initializePayment);
+
+
+router.post('/pay', authorization,  initiateProductPayment);
 
 module.exports = router;

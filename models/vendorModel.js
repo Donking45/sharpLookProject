@@ -52,6 +52,11 @@ const vendorSchema = new mongoose.Schema({
       type: [Number],
       index: '2dsphere'
     },
+    businessName: String,
+    businessDescription: String,
+    location: String,
+    businessRegNumber: String,
+    PortfolioLink: String,
     formattedAddress: String
   }
 }, { timestamps: true });
