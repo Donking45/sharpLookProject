@@ -36,6 +36,7 @@ const vendorRegistration = async (req, res) => {
       email: email.toLowerCase(),
       password,
       serviceType,
+      address,
       emailOTP,
       emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
     });
