@@ -10,9 +10,9 @@ const vendorRegistration = async (req, res) => {
       return res.status(400).json({ message: "Request body is missing" });
     }
 
-    const { email, password, confirmPassword, serviceType } = req.body;
+    const { email, password, confirmPassword, serviceType, address } = req.body;
 
-    if (!email || !password || !confirmPassword || !serviceType) {
+    if (!email || !password || !confirmPassword || !serviceType || !address) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
