@@ -65,7 +65,7 @@ const vendorSchema = new mongoose.Schema({
 vendorSchema.pre('save', async function(next) {
   if (!this.isModified('address'))
     return next()
-  const loc = await geocode(this.address);
+  const loc = await geocode.forwardGeocode(this.address);
   this.location = {
     type: 'Point',
     coordinates: [loc[0].longitude, loc[0].latitude],
@@ -74,6 +74,7 @@ vendorSchema.pre('save', async function(next) {
 
    next();
 })
+
 const updateProfile = async (req, res) => {
   const {id} = req.vendor;
   try {
