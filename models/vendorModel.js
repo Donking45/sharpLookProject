@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const {geocode}= require('../utils/geocoder')
+const geocode = require('../utils/geocoder')
 
 const vendorSchema = new mongoose.Schema({
   rating:{
