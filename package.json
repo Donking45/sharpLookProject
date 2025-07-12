@@ -24,6 +24,7 @@
     "node-geocoder": "^4.4.1",
     "node-paystack": "^1.0.3",
     "nodemailer": "^7.0.4",
+    "opencage-api-client": "^1.2.0",
     "twilio": "^5.7.2"
   },
   "devDependencies": {

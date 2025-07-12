@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const geocoder = require('../utils/geocoder')
+const {geocode}= require('../utils/geocoder')
 
 const vendorSchema = new mongoose.Schema({
   rating:{
@@ -65,7 +65,7 @@ const vendorSchema = new mongoose.Schema({
 vendorSchema.pre('save', async function(next) {
   if (!this.isModified('address'))
     return next()
-  const loc = await geocoder.geocode(this.address);
+  const loc = await geocode(this.address);
   this.location = {
     type: 'Point',
     coordinates: [loc[0].longitude, loc[0].latitude],
