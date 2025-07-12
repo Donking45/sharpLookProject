@@ -63,17 +63,26 @@ const vendorSchema = new mongoose.Schema({
 
 // Geocode & create location
 vendorSchema.pre('save', async function(next) {
-  if (!this.isModified('address'))
-    return next()
-  const loc = await geocode.forwardGeocode(this.address);
-  this.location = {
-    type: 'Point',
-    coordinates: [loc[0].longitude, loc[0].latitude],
-    formattedAddress: loc[0].formattedAddress
+  if (!this.isModified('address') || !this.address || typeof this.address !== 'string' || this.address.trim() === '') {
+    return next(new Error('Invalid or missing address'));
   }
-
-   next();
-})
+  try {
+    console.log('Geocoding address:', this.address); // Debug
+    const loc = await geocode(this.address);
+    if (!loc || !loc[0]) {
+      return next(new Error('No geocoding results found for address'));
+    }
+    this.location = {
+      type: 'Point',
+      coordinates: [loc[0].longitude, loc[0].latitude],
+      formattedAddress: loc[0].formattedAddress
+    };
+    next();
+  } catch (error) {
+    console.error('Geocoding error:', error.message, error.status); // Debug
+    next(error);
+  }
+});
 
 const updateProfile = async (req, res) => {
   const {id} = req.vendor;
