@@ -76,8 +76,8 @@ vendorSchema.pre('save', async function (next) {
     const loc = geoData.results[0];
     this.location = {
       type: 'Point',
-      coordinates: [loc.geometry.lng, loc.geometry.lat],
-      formattedAddress: loc.formatted,
+      coordinates: [lng, lat],
+      formattedAddress: formatted || 'Unknown',
     };
     
     // optionally keep or remove address
