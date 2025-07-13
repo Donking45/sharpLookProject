@@ -161,8 +161,8 @@ const completeVendorProfile = async (req, res) => {
     vendor.portfolioLink = portfolioLink;
     vendor.location = {
       type: 'Point',
-      coordinates: [loc[0].longitude, loc[0].latitude],
-      formattedAddress: loc[0].formattedAddress,
+      coordinates: [lng, lat],
+      formattedAddress: formatted  || 'Unknown',
     };
 
     await vendor.save();
