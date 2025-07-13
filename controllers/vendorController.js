@@ -426,6 +426,9 @@ const findVendorsByAddress = async (req, res) => {
         q: address,
         key: process.env.OPENCAGE_API_KEY,
         limit: 1
+      },
+      headers: {
+        'User-Agent': 'ShapeLookApp/1.0(kimfok3@gmail.com)'
       }
     });
 
