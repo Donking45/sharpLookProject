@@ -414,20 +414,26 @@ const updateVendor = async (req, res) => {
 // find nearest vendor
 const findVendorsByAddress = async (req, res) => {
   const { address, distance = 3000 } = req.body;
+
   if (!address) {
     return res.status(400).json({ message: 'Address is required' });
   }
 
   try {
+    // Geocode the address using OpenCage
     const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
       params: {
         q: address,
         key: process.env.OPENCAGE_API_KEY,
+        limit: 1
       }
     });
 
-    const location = geoRes.data.results[0].geometry;
-    const { lat, lng } = location;
+    if (!geoRes.data.results.length) {
+      return res.status(404).json({ message: 'Could not find coordinates for this address' });
+    }
+
+    const { lat, lng } = geoRes.data.results[0].geometry;
 
     const vendors = await Vendor.find({
       location: {
@@ -441,14 +447,16 @@ const findVendorsByAddress = async (req, res) => {
       }
     });
 
-    res.status(200).json({ count: vendors.length, vendors });
-  } catch (err) {
-    console.error('Error:', err.message);
+    res.status(200).json({
+      success: true,
+      count: vendors.length,
+      vendors
+    });
+  } catch (error) {
+    console.error('Error during vendor search:', error.response?.data || error.message);
     res.status(500).json({ message: 'Server error while fetching vendors by address' });
   }
 };
-
-
 
 
 
