@@ -9,7 +9,7 @@ const {  vendorRegistration,
   resendVendorOTP,
   verifyOTP,
   resetPassword,
-  findVendorsByAddress, 
+  findNearestVendors, 
   getAllVendors,
   getVendorById,
   updateVendor,
@@ -28,7 +28,7 @@ router.post('/vendor/login', login)
 router.post('/vendor/forgot-password', forgotPassword);
 router.post('/vendor/verify-reset-otp', verifyOTP)
 router.patch('/vendor/reset-password', resetPassword);
-router.post('/find-nearest-vendor', findVendorsByAddress)
+router.post('/find-nearest-vendor', findNearestVendors)
 router.get('/vendor', getAllVendors)
 router.get('/:id', getVendorById)
 router.put('/:id', updateVendor)

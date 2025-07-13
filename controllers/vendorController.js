@@ -412,52 +412,36 @@ const updateVendor = async (req, res) => {
 
 
 // find nearest vendor
-const findVendorsByAddress = async (req, res) => {
-  const { address, distance = 3000 } = req.body;
 
-  if (!address) {
-    return res.status(400).json({ message: 'Address is required' });
-  }
 
+const findNearestVendors = async (req, res) => {
   try {
-    // Geocode the address using OpenCage
-    const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
-      params: {
-        q: address,
-        key: process.env.OPENCAGE_API_KEY,
-        limit: 1
-      },
-      headers: {
-        'User-Agent': 'ShapeLookApp/1.0(kimfok3@gmail.com)'
-      }
-    });
+    const { lat, lng, distance = 3000 } = req.body; // meters
 
-    if (!geoRes.data.results.length) {
-      return res.status(404).json({ message: 'Could not find coordinates for this address' });
+    if (!lat || !lng) {
+      return res.status(400).json({ message: 'Latitude and longitude are required.' });
     }
-
-    const { lat, lng } = geoRes.data.results[0].geometry;
 
     const vendors = await Vendor.find({
       location: {
         $near: {
           $geometry: {
             type: 'Point',
-            coordinates: [lng, lat]
+            coordinates: [parseFloat(lng), parseFloat(lat)],
           },
-          $maxDistance: parseInt(distance)
-        }
-      }
+          $maxDistance: parseInt(distance, 10),
+        },
+      },
     });
 
     res.status(200).json({
       success: true,
       count: vendors.length,
-      vendors
+      vendors,
     });
-  } catch (error) {
-    console.error('Error during vendor search:', error.response?.data || error.message);
-    res.status(500).json({ message: 'Server error while fetching vendors by address' });
+  } catch (err) {
+    console.error('Nearest-vendors error:', err.message);
+    res.status(500).json({ message: 'Server error while finding nearest vendors.' });
   }
 };
 
@@ -472,7 +456,7 @@ module.exports = {
   resendVendorOTP,
   verifyOTP,
   resetPassword,
-  findVendorsByAddress,
+  findNearestVendors,
   getAllVendors,
   getVendorById,
   updateVendor,
