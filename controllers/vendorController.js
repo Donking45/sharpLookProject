@@ -81,7 +81,7 @@ const resendVendorOTP = async (req, res) =>{
     vendor.emailOTP = newOTP;
     vendor.emailOTPExpires = Date.now() + 10 * 60 * 1000;
 
-    await vendorRegistration.save({ validateBeforeSave: false})
+    await vendor.save({ validateBeforeSave: false})
 
     await sendEmail({
       email: vendor.email,
