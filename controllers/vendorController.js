@@ -412,32 +412,46 @@ const updateVendor = async (req, res) => {
 
 
 // find nearest vendor
-const find_vendor = async(req, res) =>{
-  try{
-    const latitiude = req.body.latitiude;
-    const longitude = req.body.longitude;
+const findVendorsByAddress = async (req, res) => {
+  const { address, distance = 3000 } = req.body;
+  if (!address) {
+    return res.status(400).json({ message: 'Address is required' });
+  }
 
-    const vendor_data = await Vendor.aggregate([
-      {
-        $geoNear:{
-           near: {type:"Point", coordinates:[parseFloat(longitude), parseFloat(latitiude)]},
-           key:"location",
-           maxDistance:parseFloat(1000)*1609,
-           distanceField:"dist.calculated",
-           spherical:true
+  try {
+    const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
+      params: {
+        q: address,
+        key: process.env.OPENCAGE_API_KEY,
+      }
+    });
+
+    const location = geoRes.data.results[0].geometry;
+    const { lat, lng } = location;
+
+    const vendors = await Vendor.find({
+      location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [lng, lat]
+          },
+          $maxDistance: parseInt(distance)
         }
       }
-    ])
-    
-    res.status(200).send({
-      success:true, msg:"Vendor details", data:vendor_data
-    })
-  } catch(error) {
-    res.status(400).send({
-      success:false, msg:error.message
-    })
+    });
+
+    res.status(200).json({ count: vendors.length, vendors });
+  } catch (err) {
+    console.error('Error:', err.message);
+    res.status(500).json({ message: 'Server error while fetching vendors by address' });
   }
-}
+};
+
+
+
+
+
 module.exports = {
   vendorRegistration,
   verifyVendorOtp,
@@ -447,7 +461,7 @@ module.exports = {
   resendVendorOTP,
   verifyOTP,
   resetPassword,
-  find_vendor,
+  findVendorsByAddress,
   getAllVendors,
   getVendorById,
   updateVendor,
