@@ -3,10 +3,6 @@ const Vendor = require('../models/vendorModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const geocode = require('../utils/geocoder')
-//const axios = require('axios');
-
-
-const geocode = require('./geocode'); // Ensure the geocode module is imported
 
 const vendorRegistration = async (req, res) => {
   try {
