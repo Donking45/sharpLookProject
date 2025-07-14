@@ -54,20 +54,21 @@ const vendorRegistration = async (req, res) => {
     console.log('OpenCage API response:', JSON.stringify(geoData, null, 2));
 
     // Validate geocoding response
-    if (!geoData || !geoData.results || !geoData.results.length || !geoData.results[0].geometry) {
+    if (!geoData || !Array.isArray(geoData) || !geoData.length || !geoData[0]) {
       return res.status(400).json({ message: 'Could not geocode address' });
     }
-
-    // Extract lat and lng from geometry
-    const { lat, lng } = geoData.results[0].geometry;
-    const formattedAddress = geoData.results[0].formatted;
-
-    // Validate lat and lng
-    if (typeof lat !== 'number' || typeof lng !== 'number') {
-      console.error('Invalid geocoding coordinates:', { lat, lng });
-      return res.status(400).json({ message: 'Invalid geocoding coordinates' });
+    
+    const { latitude, longitude, formattedAddress }= geoData[0];
+    if (typeof latitude !== 'number' || typeof longitude !== 'number' || !formattedAddress){
+      console.error('invsalid geocoding response:', geoData[0]);
+      return res.status(400).json({message:'invalid geocoding response'})
     }
 
+    
+    // Extract lat and lng from geometry
+    const lat = Latitude
+    const lng = longitude
+    
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
     // Create new vendor
