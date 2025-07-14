@@ -6,58 +6,78 @@ const geocode = require('../utils/geocoder')
 //const axios = require('axios');
 
 
+const geocode = require('./geocode'); // Ensure the geocode module is imported
+
 const vendorRegistration = async (req, res) => {
   try {
+    // Validate request body
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({ message: "Request body is missing" });
     }
 
     const { email, password, confirmPassword, serviceType, address } = req.body;
 
+    // Validate required fields
     if (!email || !password || !confirmPassword || !serviceType || !address) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Validate password length
     if (password.length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 characters long" });
     }
 
+    // Validate password match
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
+    // Check for existing vendor
     const existingVendor = await Vendor.findOne({ email: email.toLowerCase() });
     if (existingVendor) {
       return res.status(400).json({ message: "Vendor already exists with this email" });
     }
-    
-    // GEOCODE the address using OpenCage
-   // const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json',{
-    const geoData = await geocode({
-      params: {
+
+    // Geocode the address using OpenCage
+    let geoData;
+    try {
+      geoData = await geocode({
         q: address,
         key: process.env.OPENCAGE_API_KEY,
-        limit: 1
-      },
-      headers: {
-        'User-Agent': 'ShapeLookApp/1.0(kingsleyokon610@gmail.com)'
-      }
-    });
-
-    if (!geoData || !geoData.results || !geoData.data.results[0]) {
-      return res.status(400).json({ message: 'Could not geocode address' })
+        limit: 1,
+        headers: {
+          'User-Agent': 'ShapeLookApp/1.0(kingsleyokon610@gmail.com)',
+        },
+      });
+    } catch (apiError) {
+      console.error('Geocode error:', apiError.message);
+      return res.status(400).json({ message: 'Geocoding service unavailable', error: apiError.message });
     }
 
+    // Log the response for debugging
+    console.log('OpenCage API response:', JSON.stringify(geoData, null, 2));
 
-    const lat = geoData.data.results[0].lat;
-    const lng = geoData.data.results[0].lng;
-    const formattedAddress = geoData.data.results[0].formatted;
+    // Validate geocoding response
+    if (!geoData || !geoData.results || !geoData.results.length || !geoData.results[0].geometry) {
+      return res.status(400).json({ message: 'Could not geocode address' });
+    }
+
+    // Extract lat and lng from geometry
+    const { lat, lng } = geoData.results[0].geometry;
+    const formattedAddress = geoData.results[0].formatted;
+
+    // Validate lat and lng
+    if (typeof lat !== 'number' || typeof lng !== 'number') {
+      console.error('Invalid geocoding coordinates:', { lat, lng });
+      return res.status(400).json({ message: 'Invalid geocoding coordinates' });
+    }
 
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
+    // Create new vendor
     const newVendor = new Vendor({
       email: email.toLowerCase(),
-      password,
+      password, // Note: Password should be hashed (see recommendations)
       serviceType,
       address: formattedAddress,
       emailOTP,
@@ -65,25 +85,26 @@ const vendorRegistration = async (req, res) => {
       location: {
         type: 'Point',
         coordinates: [lng, lat],
-        formattedAddress
-      }
+        formattedAddress,
+      },
     });
 
     await newVendor.save();
 
+    // Send email with OTP
     await sendEmail({
       email: newVendor.email,
-      subject: "Email Verification OTP",
+      subject: 'Email Verification OTP',
       message: `Your OTP for verification is: ${emailOTP}`,
     });
 
     res.status(201).json({
-      message: "Vendor registered successfully. OTP sent to email.",
+      message: 'Vendor registered successfully. OTP sent to email.',
       vendorId: newVendor._id,
     });
   } catch (error) {
-    console.error("Vendor registration error:", error);
-    res.status(500).json({ message: "Server error during registration", error: error.message });
+    console.error('Vendor registration error:', error);
+    res.status(500).json({ message: 'Server error during registration', error: error.message });
   }
 };
 
