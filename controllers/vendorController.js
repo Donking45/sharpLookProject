@@ -44,7 +44,7 @@ const vendorRegistration = async (req, res) => {
       }
     });
 
-    if (!geoData.results || !geoData.data.results.length) {
+    if (!geoData || !geoData.results || !geoData.data.results[0]) {
       return res.status(400).json({ message: 'Could not geocode address' })
     }
 
