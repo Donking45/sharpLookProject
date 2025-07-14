@@ -47,7 +47,8 @@ const vendorRegistration = async (req, res) => {
     }
 
 
-    const { lat, lng } = geoRes.data.results[0].geometry;
+    const lat = geoRes.data.results[0].lat;
+    const lng = geoRes.data.results[0].lng;
     const formattedAddress = geoRes.data.results[0].formatted;
 
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
