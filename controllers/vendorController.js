@@ -28,7 +28,26 @@ const vendorRegistration = async (req, res) => {
     if (existingVendor) {
       return res.status(400).json({ message: "Vendor already exists with this email" });
     }
+  
+    // GEOCODE the address using OpenCage
+    const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json',{
+      params: {
+        q: address,
+        key: process.env.OPENCAGE_API_KEY,
+        limit: 1
+      },
+      headers: {
+        'User-Agent': 'ShapeLookApp/1.0(kingsleyokon610@gmail.com)'
+      }
+    });
 
+    if (!geoRes.data.results.length) {
+      return res.status(400).json({ message: 'Could not geocode address' })
+    }
+
+
+    const { lat, lng } = geoRes.data.results[0].geometry;
+    const formattedAddress = geoRes.data.results[0].formatted
 
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
@@ -39,6 +58,11 @@ const vendorRegistration = async (req, res) => {
       address,
       emailOTP,
       emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
+      location: {
+        type: 'Point',
+        coordinates: [lng, lat],
+        formattedAddress: formattedAddress
+      }
     });
 
     await newVendor.save();
