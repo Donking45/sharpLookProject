@@ -11,9 +11,9 @@ const vendorRegistration = async (req, res) => {
       return res.status(400).json({ message: "Request body is missing" });
     }
 
-    const { email, password, confirmPassword, serviceType, address } = req.body;
+    const { email, password, confirmPassword, serviceType, address: rawAddress } = req.body;
 
-    if (!email || !password || !confirmPassword || !serviceType || !address) {
+    if (!email || !password || !confirmPassword || !serviceType || !rawAddress) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -29,11 +29,11 @@ const vendorRegistration = async (req, res) => {
     if (existingVendor) {
       return res.status(400).json({ message: "Vendor already exists with this email" });
     }
-  
+    
     // GEOCODE the address using OpenCage
     const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json',{
       params: {
-        q: address,
+        q: rawAddress,
         key: process.env.OPENCAGE_API_KEY,
         limit: 1
       },
@@ -48,7 +48,7 @@ const vendorRegistration = async (req, res) => {
 
 
     const { lat, lng } = geoRes.data.results[0].geometry;
-    const formattedAddress = geoRes.data.results[0].formatted
+    const formattedAddress = geoRes.data.results[0].formatted;
 
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
@@ -56,13 +56,14 @@ const vendorRegistration = async (req, res) => {
       email: email.toLowerCase(),
       password,
       serviceType,
+      address: formattedAddress,
       address,
       emailOTP,
       emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
       location: {
         type: 'Point',
         coordinates: [lng, lat],
-        formattedAddress: formattedAddress
+        formattedAddress
       }
     });
 
