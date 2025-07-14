@@ -37,7 +37,7 @@ const vendorRegistration = async (req, res) => {
     // Geocode the address using OpenCage
     let geoData;
     try {
-      geoData = await geocode({
+      geoData = await geocoder.geocode(address.trim())({
         q: address,
         key: process.env.OPENCAGE_API_KEY,
         limit: 1,
@@ -64,7 +64,7 @@ const vendorRegistration = async (req, res) => {
       return res.status(400).json({message:'invalid geocoding response'})
     }
 
-    
+
     // Extract lat and lng from geometry
     const lat = Latitude
     const lng = longitude
