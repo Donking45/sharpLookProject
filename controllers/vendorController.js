@@ -2,7 +2,8 @@ const { sendEmail} = require('../utils/sendMail')
 const Vendor = require('../models/vendorModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
+const geocode = require('../utils/geocoder')
+//const axios = require('axios');
 
 
 const vendorRegistration = async (req, res) => {
@@ -31,7 +32,8 @@ const vendorRegistration = async (req, res) => {
     }
     
     // GEOCODE the address using OpenCage
-    const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json',{
+   // const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json',{
+    const geoData = await geocode({
       params: {
         q: address,
         key: process.env.OPENCAGE_API_KEY,
