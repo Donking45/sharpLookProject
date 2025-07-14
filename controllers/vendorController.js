@@ -42,14 +42,14 @@ const vendorRegistration = async (req, res) => {
       }
     });
 
-    if (!geoData.results || !geoRes.data.results.length) {
+    if (!geoData.results || !geoData.data.results.length) {
       return res.status(400).json({ message: 'Could not geocode address' })
     }
 
 
-    const lat = geoRes.data.results[0].lat;
-    const lng = geoRes.data.results[0].lng;
-    const formattedAddress = geoRes.data.results[0].formatted;
+    const lat = geoData.data.results[0].lat;
+    const lng = geoData.data.results[0].lng;
+    const formattedAddress = geoData.data.results[0].formatted;
 
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
