@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const geocode = require('../utils/geocoder')
 
+
 const vendorRegistration = async (req, res) => {
   try {
     // Validate request body
