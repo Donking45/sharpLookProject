@@ -3,7 +3,17 @@ const Vendor = require('../models/vendorModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const geocode = require('../utils/geocoder')
+const NodeGeocoder = require('node-geocoder')
+require('dotenv').config(); 
 
+
+
+const geocoder = NodeGeocoder ({
+  provider: 'opencage',
+  apiKey: process.env.OPENCAGE_API_KEY,
+  httpAdapter: 'https',
+  formatter: null
+})
 
 const vendorRegistration = async (req, res) => {
   try {
