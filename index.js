@@ -2,17 +2,10 @@ const express  = require("express")
 const mongoose = require("mongoose")
 const routes = require('./routes')
 const cors = require('cors')
-const NodeGeocoder = require('node-geocoder')
+
 require('dotenv').config(); 
 
 
-
-const geocoder = NodeGeocoder ({
-  provider: 'opencage',
-  apiKey: process.env.OPENCAGE_API_KEY,
-  httpAdapter: 'https',
-  formatter: null
-})
 
 
 const app = express()

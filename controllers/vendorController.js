@@ -3,17 +3,7 @@ const Vendor = require('../models/vendorModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const geocode = require('../utils/geocoder')
-const NodeGeocoder = require('node-geocoder')
-require('dotenv').config(); 
 
-
-
-const geocoder = NodeGeocoder ({
-  provider: 'opencage',
-  apiKey: process.env.OPENCAGE_API_KEY,
-  httpAdapter: 'https',
-  formatter: null
-})
 
 const vendorRegistration = async (req, res) => {
   try {
@@ -45,40 +35,7 @@ const vendorRegistration = async (req, res) => {
       return res.status(400).json({ message: "Vendor already exists with this email" });
     }
 
-    // Geocode the address using OpenCage
-    let geoData;
-    try {
-      geoData = await geocoder.geocode(address.trim())({
-        q: address,
-        key: process.env.OPENCAGE_API_KEY,
-        limit: 1,
-        headers: {
-          'User-Agent': 'ShapeLookApp/1.0(kingsleyokon610@gmail.com)',
-        },
-      });
-    } catch (apiError) {
-      console.error('Geocode error:', apiError.message);
-      return res.status(400).json({ message: 'Geocoding service unavailable', error: apiError.message });
-    }
-
-    // Log the response for debugging
-    console.log('OpenCage API response:', JSON.stringify(geoData, null, 2));
-
-    // Validate geocoding response
-    if (!geoData || !Array.isArray(geoData) || !geoData.length || !geoData[0]) {
-      return res.status(400).json({ message: 'Could not geocode address' });
-    }
-    
-    const { latitude, longitude, formattedAddress }= geoData[0];
-    if (typeof latitude !== 'number' || typeof longitude !== 'number' || !formattedAddress){
-      console.error('invsalid geocoding response:', geoData[0]);
-      return res.status(400).json({message:'invalid geocoding response'})
-    }
-
-
-    // Extract lat and lng from geometry
-    const lat = Latitude
-    const lng = longitude
+  
     
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
