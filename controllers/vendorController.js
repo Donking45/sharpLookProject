@@ -35,7 +35,14 @@ const vendorRegistration = async (req, res) => {
       return res.status(400).json({ message: "Vendor already exists with this email" });
     }
 
-  
+    const geoData = await geocodeAddress(address.trim());
+    if (!geoData) {
+      return res.status(400).json({
+        message: "Unable to get coordinates for this address"
+      })
+    }
+
+    const {latitude, longitude, formattedAddress} = geoData
     
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
@@ -49,8 +56,7 @@ const vendorRegistration = async (req, res) => {
       emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
       location: {
         type: 'Point',
-        coordinates: [lng, lat],
-        formattedAddress,
+        coordinates: [longitude, latitude],
       },
     });
 
