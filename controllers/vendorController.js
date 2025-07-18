@@ -35,7 +35,7 @@ const vendorRegistration = async (req, res) => {
       return res.status(400).json({ message: "Vendor already exists with this email" });
     }
 
-    const geoData = await geocodeAddress(address.trim());
+    const geoData = await geocode(address.trim());
     if (!geoData) {
       return res.status(400).json({
         message: "Unable to get coordinates for this address"
