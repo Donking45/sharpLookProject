@@ -21,14 +21,14 @@ const {  vendorRegistration,
 router.post('/register-vendor',  vendorRegistration);
 
 // Route to handle additional vendor profile completion
-router.get('/vendor/complete-profile', authorization,  completeVendorProfile);
+router.post('/vendor/complete-profile',  completeVendorProfile);
 router.post('/vendor/resend-otp', resendVendorOTP)
 router.post('/vendor/verify-otp', verifyVendorOtp)
 router.post('/vendor/login', login)
 router.post('/vendor/forgot-password', forgotPassword);
 router.post('/vendor/verify-reset-otp', verifyOTP)
 router.patch('/vendor/reset-password', resetPassword);
-router.post('/find-nearest-vendor', findNearestVendors)
+router.get('/find-nearest-vendor', findNearestVendors)
 router.get('/vendor', getAllVendors)
 router.get('/:id', getVendorById)
 router.put('/:id', updateVendor)
