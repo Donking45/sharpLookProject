@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const geocode = require('../utils/geocoder')
+
+const vendorProfileSchema = new mongoose.Schema({
+  businessName: String,
+  businessDescription: String,
+  location: String,
+  businessRegNumber: String,
+  PortfolioLink: String,
+})
 
 const vendorSchema = new mongoose.Schema({
   rating:{
@@ -43,52 +50,16 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add an address']
   },
-  location: {
-    type: {
-      type: String,
-      enum: ['Point']
-    },
-    coordinates: {
-      type: [Number],
-      index: '2dsphere'
-    },
-    businessName: String,
-    businessDescription: String,
-    location: String,
-    businessRegNumber: String,
-    PortfolioLink: String,
-    formattedAddress: String
-  }
-}, { timestamps: true });
+  longitude: {
+    type: Number
+  },
+  latitude: {
+    type: Number
+  },
+  vendorProfile: vendorProfileSchema,
+ },{ timestamps: true });
 
-// Geocode & create location
 
-vendorSchema.pre('save', async function (next) {
-  if (!this.address) return next(); // Skip if no address
-
-  try {
-    const geoData = await geocode({
-      q: this.address,
-      key: process.env.OPENCAGE_API_KEY,
-      language: 'en'
-    });
-
-    const loc = geoData.results[0];
-    this.location = {
-      type: 'Point',
-      coordinates: [lng, lat],
-      formattedAddress: formatted || 'Unknown',
-    };
-    
-    // optionally keep or remove address
-    // this.address = undefined;
-
-    next();
-  } catch (err) {
-    console.error('Geocode error:', err);
-    next(err);
-  }
-});
 
 
 const updateProfile = async (req, res) => {

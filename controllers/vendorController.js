@@ -49,11 +49,10 @@ const vendorRegistration = async (req, res) => {
       })
     }
 
-    const {latitude, longitude} = geoResponse.data.results[0].geometry;
+    const location = geoResponse.data.results[0].geometry;
+    const latitude = location.lat;
+    const longitude = loacation.lng
 
-    console.log("Coordinates:", {
-      latitude, longitude
-    })
     
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
@@ -65,10 +64,8 @@ const vendorRegistration = async (req, res) => {
       address,
       emailOTP,
       emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
-      location: {
-        type: 'Point',
-        coordinates: [longitude, latitude],
-      },
+      latitude,
+      longitude
     });
 
     await newVendor.save();
@@ -467,9 +464,9 @@ const updateVendor = async (req, res) => {
 
 const findNearestVendors = async (req, res) => {
   try {
-    const { lat, lng, distance = 3000 } = req.body; // meters
+    const { latitude, longitude, distance = 3000 } = req.body; // meters
 
-    if (!lat || !lng) {
+    if (!latitude || !longitude) {
       return res.status(400).json({ message: 'Latitude and longitude are required.' });
     }
 
@@ -478,7 +475,7 @@ const findNearestVendors = async (req, res) => {
         $near: {
           $geometry: {
             type: 'Point',
-            coordinates: [parseFloat(lng), parseFloat(lat)],
+            coordinates: [parseFloat(longitude), parseFloat(latitude)],
           },
           $maxDistance: parseInt(distance, 10),
         },
