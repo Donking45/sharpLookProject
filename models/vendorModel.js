@@ -56,11 +56,23 @@ const vendorSchema = new mongoose.Schema({
   latitude: {
     type: Number
   },
+  location: {
+    type: {
+      type: String,
+      enum: ['point']
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
+  },
   vendorProfile: vendorProfileSchema,
  },{ timestamps: true });
 
 
-
+vendorSchema.index({ location:
+  '2dsphere'
+})
 
 const updateProfile = async (req, res) => {
   const {id} = req.vendor;
