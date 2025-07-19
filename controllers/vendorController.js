@@ -2,7 +2,8 @@ const { sendEmail} = require('../utils/sendMail')
 const Vendor = require('../models/vendorModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const geocode = require('../utils/geocoder')
+const axios = require('axios')
+
 
 
 const vendorRegistration = async (req, res) => {
@@ -35,14 +36,24 @@ const vendorRegistration = async (req, res) => {
       return res.status(400).json({ message: "Vendor already exists with this email" });
     }
 
-    const geoData = await geocode(address.trim());
-    if (!geoData) {
+    const geoResponse = await axios.get('https://api.openCagedata.com/geocode/v1/json', {
+      params: {
+        q: address,
+        key: process.env.OPENCAGE_API_KEY,
+      },
+    });
+
+    if (!geoResponse.data.results.length) {
       return res.status(400).json({
-        message: "Unable to get coordinates for this address"
+        message: "Invalid address or no coordinates found"
       })
     }
 
-    const {latitude, longitude, formattedAddress} = geoData
+    const {latitude, longitude} = geoResponse.data.results[0].geometry;
+
+    console.log("Coordinates:", {
+      latitude, longitude
+    })
     
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
 
