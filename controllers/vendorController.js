@@ -51,7 +51,7 @@ const vendorRegistration = async (req, res) => {
 
     const location = geoResponse.data.results[0].geometry;
     const latitude = location.lat;
-    const longitude = loacation.lng
+    const longitude = location.lng
 
     
     const emailOTP = Math.floor(1000 + Math.random() * 9000).toString();
@@ -85,6 +85,7 @@ const vendorRegistration = async (req, res) => {
     console.error('Vendor registration error:', error);
     res.status(500).json({ message: 'Server error during registration', error: error.message });
   }
+
 };
 
 const resendVendorOTP = async (req, res) =>{
