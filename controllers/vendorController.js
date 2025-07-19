@@ -194,13 +194,16 @@ const completeVendorProfile = async (req, res) => {
       return res.status(400).json({ message: 'Geocoding service unavailable' });
     }
 
-    console.log('OpenCage API response:', JSON.stringify(geoRes.data, null, 2));
+    console.log('OpenCage API response:', JSON.stringify(geoResponse.data, null, 2));
 
-    if (!geoReponse.data.results || !geoResponse.data.results.length || !geoResponse.data.results[0].geometry) {
+    if (!geoResponse.data.results || !geoResponse.data.results.length || !geoResponse.data.results[0].geometry) {
       return res.status(400).json({ message: 'Invalid address' });
     }
 
-    const { latitude, longitude } = geoRes.data.results[0].geometry;
+    const location = geoResponse.data.results[0].geometry;
+    const latitude = location.lat;
+    const longitude = location.lng
+
     
 
     // Set profile and location
@@ -209,10 +212,8 @@ const completeVendorProfile = async (req, res) => {
     vendor.address = address;
     vendor.businessRegNumber = businessRegNumber;
     vendor.portfolioLink = portfolioLink;
-    vendor.location = {
-      type: 'Point',
-      coordinates: [latitude, longitude],
-    };
+    vendor.longitude = longitude;
+    vendor.latitude = latitude;
 
     await vendor.save();
 
