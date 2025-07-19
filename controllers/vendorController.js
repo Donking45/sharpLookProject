@@ -62,7 +62,7 @@ const vendorRegistration = async (req, res) => {
       email: email.toLowerCase(),
       password, // Note: Password should be hashed (see recommendations)
       serviceType,
-      address: formattedAddress,
+      address,
       emailOTP,
       emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
       location: {
