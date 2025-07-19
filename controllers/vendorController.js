@@ -65,7 +65,11 @@ const vendorRegistration = async (req, res) => {
       emailOTP,
       emailOTPExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
       latitude,
-      longitude
+      longitude,
+      location: {
+        type: 'Point',
+        coordinates: [parseFloat(longitude), parseFloat(latitude)]
+      }
     });
 
     await newVendor.save();
