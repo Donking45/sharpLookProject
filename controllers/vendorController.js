@@ -179,9 +179,9 @@ const completeVendorProfile = async (req, res) => {
     if (!vendor) return res.status(404).json({ message: 'Vendor not found.' });
 
     // Geocode the address using OpenCage
-    let geoRes;
+    let geoResponse;
     try {
-      geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
+      geoResponse = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
         params: {
           q: address,
           key: process.env.OPENCAGE_API_KEY,
@@ -198,12 +198,12 @@ const completeVendorProfile = async (req, res) => {
 
     console.log('OpenCage API response:', JSON.stringify(geoRes.data, null, 2));
 
-    if (!geoRes.data.results || !geoRes.data.results.length || !geoRes.data.results[0].geometry) {
+    if (!geoReponse.data.results || !geoResponse.data.results.length || !geoResponse.data.results[0].geometry) {
       return res.status(400).json({ message: 'Invalid address' });
     }
 
-    const { lat, lng } = geoRes.data.results[0].geometry;
-    const formattedAddress = geoRes.data.results[0].formatted;
+    const { latitude, longitude } = geoRes.data.results[0].geometry;
+    
 
     // Set profile and location
     vendor.businessName = businessName;
@@ -213,8 +213,7 @@ const completeVendorProfile = async (req, res) => {
     vendor.portfolioLink = portfolioLink;
     vendor.location = {
       type: 'Point',
-      coordinates: [lng, lat],
-      formattedAddress: formattedAddress || 'Unknown',
+      coordinates: [latitude, longitude],
     };
 
     await vendor.save();
