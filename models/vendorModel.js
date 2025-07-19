@@ -59,7 +59,7 @@ const vendorSchema = new mongoose.Schema({
   location: {
     type: {
       type: String,
-      enum: ['point']
+      enum: ['Point']
     },
     coordinates: {
       type: [Number],
