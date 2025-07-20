@@ -243,8 +243,9 @@ const completeVendorProfile = async (req, res) => {
         address,
         businessRegNumber,
         portfolioLink,
-        latitude: lat,
-        longitude: lng,
+        latitude,
+        longitude,
+        location: { type: 'Point', coordinates: [longitude, latitude] }
       },
     });
   } catch (error) {

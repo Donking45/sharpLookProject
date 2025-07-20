@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const {authorization} = require('../middlewares/authMiddleware');
 const  upload  = require('../middlewares/multer'); // adjust path as needed
 const {  vendorRegistration,
   verifyVendorOtp,
@@ -21,7 +22,7 @@ const {  vendorRegistration,
 router.post('/register-vendor',  vendorRegistration);
 
 // Route to handle additional vendor profile completion
-router.post('/vendor/complete-profile',  completeVendorProfile);
+router.post('/vendor/complete-profile', authorization,  completeVendorProfile);
 router.post('/vendor/resend-otp', resendVendorOTP)
 router.post('/vendor/verify-otp', verifyVendorOtp)
 router.post('/vendor/login', login)
