@@ -227,9 +227,9 @@ const completeVendorProfile = async (req, res) => {
       address,
       businessRegNumber,
       portfolioLink,
-      latitude: lat,
-      longitude: lng,
-      location: { type: 'Point', coordinates: [lng, lat] }
+      latitude,
+      longitude,
+      location: { type: 'Point', coordinates: [longitude, latitude] }
     });
 
     await vendor.save();
