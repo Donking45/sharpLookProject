@@ -36,7 +36,7 @@ const validateRegister = (req, res, next)=>{
 
 
 const authorization = async (req, res, next)=>{
-
+  try {
     const token = req.header("Authorization")
 
     if(!token){
@@ -63,6 +63,10 @@ const authorization = async (req, res, next)=>{
     req.vendor = vendor
 
     next()
+  } catch (err) {
+    res.status(401).json({ message: "Unauthorized"})
+  }
+    
 }
 
 

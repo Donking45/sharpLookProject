@@ -161,17 +161,31 @@ const verifyVendorOtp = async (req, res) => {
   res.status(200).json({ message: "Account verified successfully" });
 };
 
+
 const completeVendorProfile = async (req, res) => {
   try {
-    const vendorId = req.vendor._id;
+    if (!req.vendor || !req.vendor._id) {
+      return res.status(401).json({ message: 'Unauthorized. Vendor info missing.' });
+    }
 
-    const {
+    const vendorId = req.vendor._id;
+    let {
       businessName,
       businessDescription,
       address,
       businessRegNumber,
       portfolioLink,
     } = req.body;
+
+    // Trim input values
+    ({ businessName, businessDescription, address, businessRegNumber, portfolioLink } =
+      Object.fromEntries(Object.entries({
+        businessName,
+        businessDescription,
+        address,
+        businessRegNumber,
+        portfolioLink
+      }).map(([k, v]) => [k, v?.trim()])));
 
     if (!businessName || !businessDescription || !address || !businessRegNumber || !portfolioLink) {
       return res.status(400).json({ message: 'All fields are required.' });
@@ -180,7 +194,6 @@ const completeVendorProfile = async (req, res) => {
     const vendor = await Vendor.findById(vendorId);
     if (!vendor) return res.status(404).json({ message: 'Vendor not found.' });
 
-    // Geocode the address using OpenCage
     let geoResponse;
     try {
       geoResponse = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
@@ -190,17 +203,15 @@ const completeVendorProfile = async (req, res) => {
           limit: 1
         },
         headers: {
-          'User-Agent': 'ShapeLookApp/1.0(kingsleyokon610@gmail.com)'
+          'User-Agent': 'SharpLookApp/1.0(kingsleyokon610@gmail.com)'
         }
       });
-    } catch (Error) {
-      console.error('OpenCage API error:', Error.message);
+    } catch (err) {
+      console.error('OpenCage API error:', err.message);
       return res.status(400).json({ message: 'Geocoding service unavailable' });
     }
 
-    console.log('OpenCage API response:', JSON.stringify(geoResponse.data, null, 2));
-
-    if (!geoResponse.data.results || !geoResponse.data.results.length || !geoResponse.data.results[0].geometry) {
+    if (!geoResponse?.data?.results?.length || !geoResponse.data.results[0].geometry) {
       return res.status(400).json({ message: 'Invalid address' });
     }
 
@@ -208,29 +219,39 @@ const completeVendorProfile = async (req, res) => {
     const latitude = location.lat;
     const longitude = location.lng
 
-    
 
-    // Set profile and location
-    vendor.businessName = businessName;
-    vendor.businessDescription = businessDescription;
-    vendor.address = address;
-    vendor.businessRegNumber = businessRegNumber;
-    vendor.portfolioLink = portfolioLink;
-    vendor.longitude = longitude;
-    vendor.latitude = latitude;
+    // Update vendor profile
+    Object.assign(vendor, {
+      businessName,
+      businessDescription,
+      address,
+      businessRegNumber,
+      portfolioLink,
+      latitude: lat,
+      longitude: lng,
+      location: { type: 'Point', coordinates: [lng, lat] }
+    });
 
     await vendor.save();
 
     res.status(200).json({
       message: 'Vendor profile completed successfully',
-      vendor,
+      vendor: {
+        id: vendor._id,
+        businessName,
+        businessDescription,
+        address,
+        businessRegNumber,
+        portfolioLink,
+        latitude: lat,
+        longitude: lng,
+      },
     });
   } catch (error) {
     console.error('Complete profile error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
 
 const login = async (req, res) => {
   try {
