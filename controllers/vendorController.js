@@ -488,32 +488,30 @@ const updateVendor = async (req, res) => {
 
 
 // find nearest vendor
-
-
 const findNearestVendors = async (req, res) => {
   try {
-    const { latitude, longitude, distance = 3000 } = req.body; // meters
+    const { latitude, longitude } = req.body; // meters
 
     if (!latitude || !longitude) {
       return res.status(400).json({ message: 'Latitude and longitude are required.' });
     }
 
-    const vendors = await Vendor.find({
-      location: {
-        $near: {
-          $geometry: {
-            type: 'Point',
-            coordinates: [parseFloat(longitude), parseFloat(latitude)],
-          },
-          $maxDistance: parseInt(distance, 10),
-        },
-      },
-    });
-
+    const vendor_data = await Vendor.aggregate([
+          {
+            $geoNear:{
+              near: {type:"Point", coordinates:[parseFloat(longitude), parseFloat(latitude)]},
+              key:"location",
+              maxDistance: parseFloat(3000)*1609,
+              distanceField:"dist.calculated",
+              spherical: true
+            }
+          }
+    ])
+    
     res.status(200).json({
       success: true,
-      count: vendors.length,
-      vendors,
+      msg: "vendor details",
+      data:vendor_data,
     });
   } catch (err) {
     console.error('Nearest-vendors error:', err.message);
