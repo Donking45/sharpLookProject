@@ -15,8 +15,8 @@ const {  vendorRegistration,
   getVendorById,
   updateVendor,
   deleteVendor,
-  } = require('../controllers/vendorController');
-  const { authorization } = require('../middlewares/authMiddleware')
+} = require('../controllers/vendorController');
+
 
 // Route to handle vendor registration with file upload (e.g. ID document)
 router.post('/register-vendor',  vendorRegistration);

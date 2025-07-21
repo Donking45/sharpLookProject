@@ -164,7 +164,7 @@ const verifyVendorOtp = async (req, res) => {
 
 const completeVendorProfile = async (req, res) => {
   try {
-    if (!req.vendor || !req.vendor._id) {
+    if (!req.vendor) {
       return res.status(401).json({ message: 'Unauthorized. Vendor info missing.' });
     }
 
