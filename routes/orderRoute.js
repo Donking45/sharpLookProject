@@ -4,13 +4,13 @@ const { placeOrder, getOrders, getOrderById } = require('../controllers/orderCon
 const { authorization } = require('../middlewares/authMiddleware');
 
 // Create a new order
-router.post('/create', authorization, placeOrder);
+router.post('/order/create', authorization, placeOrder);
 
 // Get all orders for a user
-router.get('/', authorization, getOrders);
+router.get('/order', authorization, getOrders);
 
 // Get a specific order by ID
-router.get('/:id', authorization, getOrderById);
+router.get('/order/:id', authorization, getOrderById);
 
 
 module.exports = router;

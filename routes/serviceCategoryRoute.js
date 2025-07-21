@@ -10,12 +10,12 @@ const {
 const { upload } = require('../utils/cloudinary');
 
 // Public
-router.get('/', getAllCategories);
-router.get('/:id', getCategoryById);
+router.get('/category', getAllCategories);
+router.get('/category/:id', getCategoryById);
 
 // Admin-only or secured
-router.post('/', upload.single('image'), createCategory);
-router.put('/:id', upload.single('image'), updateCategory); // Optional image update
-router.delete('/:id', deleteCategory);
+router.post('/category/create', upload.single('image'), createCategory);
+router.put('/category/:id', upload.single('image'), updateCategory); // Optional image update
+router.delete('/category/:id', deleteCategory);
 
 module.exports = router;

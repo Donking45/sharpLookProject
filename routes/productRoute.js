@@ -10,12 +10,12 @@ const {
 const { authorization } = require('../middlewares/authMiddleware');
 
 // Public
-router.get('/', getAllProducts);
-router.get('/:id', getProductById);
+router.get('/product', getAllProducts);
+router.get('/product/:id', getProductById);
 
 // Vendor-only
-router.post('/', authorization, createProduct);
-router.put('/:id', authorization, updateProduct);
-router.delete('/:id', authorization, deleteProduct);
+router.post('/product/create', authorization, createProduct);
+router.put('/product/:id', authorization, updateProduct);
+router.delete('/product/:id', authorization, deleteProduct);
 
 module.exports = router;
