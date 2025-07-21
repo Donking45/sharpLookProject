@@ -31,7 +31,7 @@ const vendorSchema = new mongoose.Schema({
   otp: {type: String },
   otpExpires: {type: Date},
   serviceType: {
-    type: String,
+    type: [String],
     required: true,
     enum: ['makeup', 'nail', 'hair', 'spa', 'barbering', 'other'], // You can customize
   },
