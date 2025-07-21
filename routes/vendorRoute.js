@@ -31,8 +31,8 @@ router.post('/vendor/verify-reset-otp', verifyOTP)
 router.patch('/vendor/reset-password', resetPassword);
 router.post('/find-nearest-vendor', findNearestVendors)
 router.get('/vendor', getAllVendors)
-router.get('/:id', getVendorById)
-router.put('/:id', updateVendor)
-router.delete('/:id', deleteVendor)
+router.get('/vendor/:id', getVendorById)
+router.put('/vendor/:id', updateVendor)
+router.delete('/vendor/:id', deleteVendor)
 
 module.exports = router;
