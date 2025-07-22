@@ -9,12 +9,12 @@ const {
 const { authorization } = require('../middlewares/authMiddleware');
 
 // Create booking
-router.post('/booking/create', authorization, createBookings);
+router.post('/bookings/create', authorization, createBookings);
 
 // Get client bookings
-router.get('/booking/client', authorization, getClientBookings);
+router.get('/bookings/client', authorization, getClientBookings);
 
 // Get vendor bookings
-router.get('/booking/vendor',  getVendorBookings);
+router.get('/bookings/vendor',  getVendorBookings);
 
 module.exports = router;

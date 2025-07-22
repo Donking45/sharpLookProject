@@ -3,7 +3,7 @@ const Vendor = require('../models/vendorModel');
 
 const createBookings = async (req, res) => {
   try {
-    const { vendorId, serviceType, appointmentDate, timeSlot, location, notes } = req.body;
+    const { vendorId, serviceType, appointmentDate, timeSlot, location} = req.body;
     const clientId = req.user.id;
 
     if (!vendorId || !serviceType || !appointmentDate || !timeSlot || !location) {
@@ -16,15 +16,14 @@ const createBookings = async (req, res) => {
     }
 
     const booking = await Booking.create({
-      client: clientId,
-      vendor: vendorId,
+      vendorId,
       serviceType,
       appointmentDate,
       timeSlot,
       location,
-      notes,
     });
-
+    
+    await booking.save();
     res.status(201).json({
       message: 'Booking created successfully',
       booking,
@@ -38,7 +37,7 @@ const createBookings = async (req, res) => {
 const getClientBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ client: req.user.id })
-      .populate('vendor', 'businessName serviceType profileImage');
+      .populate('vendor', 'businessName serviceType');
 
     res.status(200).json({ bookings });
   } catch (error) {
