@@ -38,12 +38,12 @@ const createBookings = async (req, res) => {
 
 const getClientBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ client: req.user.id })
+    const bookings = await Booking.find({ clientId })
       .populate('vendor', 'businessName serviceType');
 
     res.status(200).json({ bookings });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
