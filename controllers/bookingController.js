@@ -38,6 +38,7 @@ const createBookings = async (req, res) => {
 
 const getClientBookings = async (req, res) => {
   try {
+    const clientId = req.user.id
     const bookings = await Booking.find({ clientId })
       .populate('vendor', 'businessName serviceType');
 
@@ -49,12 +50,13 @@ const getClientBookings = async (req, res) => {
 
 const getVendorBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({ vendor: req.vendor.id })
+    const vendorId = req.user.id
+    const bookings = await Booking.find({ vendorId })
       .populate('client', 'firstName lastName email');
 
     res.status(200).json({ bookings });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
