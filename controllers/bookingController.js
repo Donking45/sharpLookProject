@@ -6,7 +6,7 @@ const createBookings = async (req, res) => {
     const { vendorId, serviceType, appointmentDate, timeSlot, location} = req.body;
     const clientId = req.user.id;
 
-    if (!vendorId || !serviceType || !appointmentDate || !timeSlot || !location) {
+    if (!clientId || !vendorId || !serviceType || !appointmentDate || !timeSlot || !location) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -16,6 +16,7 @@ const createBookings = async (req, res) => {
     }
 
     const booking = await Booking.create({
+      clientId,
       vendorId,
       serviceType,
       appointmentDate,
