@@ -50,9 +50,9 @@ const getClientBookings = async (req, res) => {
 
 const getVendorBookings = async (req, res) => {
   try {
-    const vendorId = req.user.id
+    const vendorId = req.vendor.id
     const bookings = await Booking.find({ vendorId })
-      .populate('client', 'firstName lastName email');
+      .populate('clientId', 'firstName lastName email');
 
     res.status(200).json({ bookings });
   } catch (error) {
