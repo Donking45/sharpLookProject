@@ -40,7 +40,7 @@ const getClientBookings = async (req, res) => {
   try {
     const clientId = req.user.id
     const bookings = await Booking.find({ clientId })
-      .populate('vendor', 'businessName serviceType');
+      .populate('vendorId', 'businessName serviceType');
 
     res.status(200).json({ bookings });
   } catch (error) {
