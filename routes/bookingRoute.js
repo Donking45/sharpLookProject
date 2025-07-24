@@ -7,6 +7,8 @@ const {
 } = require('../controllers/bookingController');
 
 const { authorization } = require('../middlewares/authMiddleware');
+const { vendorAuth } = require('../middlewares/venMiddleware');
+
 
 // Create booking
 router.post('/bookings/create', authorization, createBookings);
@@ -15,6 +17,6 @@ router.post('/bookings/create', authorization, createBookings);
 router.get('/bookings/client', authorization, getClientBookings);
 
 // Get vendor bookings
-router.get('/bookings/vendor',  getVendorBookings);
+router.get('/bookings/vendor', vendorAuth,  getVendorBookings);
 
 module.exports = router;
