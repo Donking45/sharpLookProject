@@ -10,7 +10,7 @@ const createProduct = async (req, res) => {
 
     const price = Number(priceInput);
 
-    if (!name || !description || !req.file || !price  || !category) {
+    if (!name || !description  || !price  || !category) {
       return res.status(400).json({ message: "Please enter all fields" });
     }
 
@@ -20,7 +20,7 @@ const createProduct = async (req, res) => {
       })
     }
 
-    const result = await cloudinary.uploader.upload_stream(image,
+    const result = await cloudinary.uploader.upload(image,
       { folder: "products", width: 300, crop: "scale" },
       async (error, result) => {
         if (error) {
@@ -44,7 +44,7 @@ const createProduct = async (req, res) => {
       }
     );
 
-    result.end(req.file.buffer)
+    
   } catch (error) {
     res.status(500).json({ message: 'Failed to create product', error: error.message });
   }
