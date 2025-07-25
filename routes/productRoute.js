@@ -7,15 +7,15 @@ const {
   updateProduct,
   deleteProduct,
 } = require('../controllers/productController');
-const { authorization } = require('../middlewares/authMiddleware');
+const { venAuth } = require('../middlewares/venhMiddleware');
 
 // Public
 router.get('/product', getAllProducts);
 router.get('/product/:id', getProductById);
 
 // Vendor-only
-router.post('/product/create', authorization, createProduct);
-router.put('/product/:id', authorization, updateProduct);
-router.delete('/product/:id', authorization, deleteProduct);
+router.post('/product/create', venAuth, createProduct);
+router.put('/product/:id', venAuth, updateProduct);
+router.delete('/product/:id', venAuth, deleteProduct);
 
 module.exports = router;
