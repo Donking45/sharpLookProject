@@ -7,7 +7,7 @@ const {
   updateProduct,
   deleteProduct,
 } = require('../controllers/productController');
-const { venAuth } = require('../middlewares/venhMiddleware');
+const { venAuth } = require('../middlewares/venMiddleware');
 
 // Public
 router.get('/product', getAllProducts);
