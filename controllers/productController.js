@@ -7,7 +7,7 @@ const cloudinary = require('../utils/cloudinary');
 const createProduct = async (req, res) => {
    
   const { name, description, price, category, image } = req.body;
-
+ 
   try {
     const result = await cloudinary.uploader.upload(image,{ 
       folder: "products",
