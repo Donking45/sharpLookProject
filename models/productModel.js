@@ -25,7 +25,7 @@ const productSchema = new mongoose.Schema({
     enum: ['makeup', 'hair', 'nail', 'barbering', 'spa', 'others'],
     required: true,
   },
-  vendor: {
+  vendorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Vendor',
     required: true,

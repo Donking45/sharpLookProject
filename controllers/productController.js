@@ -1,27 +1,47 @@
 const Product = require('../models/productModel');
+const cloudinary = require('../utils/cloudinary');
 
 // @desc    Create new product
 // @route   POST /api/products
 // @access  Private (Vendor only)
 const createProduct = async (req, res) => {
   try {
-    const { name, description, price, image, category } = req.body;
+    const { name, description, price, category, image } = req.body;
 
-    const product = new Product({
-      name,
-      description,
-      price,
-      image,
-      category,
-      vendor: req.vendor.id, // assuming vendor is added to req by auth middleware
-    });
+    if (!name || !description || !req.file || !price  || !category) {
+      return res.status(400).json({ message: "Please enter all fields" });
+    }
 
-    const savedProduct = await product.save();
-    res.status(201).json(savedProduct);
+    const result = await cloudinary.uploader.upload_stream(image,
+      { folder: "products", width: 300, crop: "scale" },
+      async (error, result) => {
+        if (error) {
+          return res.status(500).json({ message: "Cloudinary error", error });
+        }
+
+        const product = new Product({
+          name,
+          description,
+          price,
+          category,
+          vendorId: req.vendor._id,
+          image: {
+            public_id: result.public_id,
+            url: result.secure_url
+          }
+        });
+
+        const savedProduct = await product.save();
+        res.status(201).json(savedProduct);
+      }
+    );
+
+    result.end(req.file.buffer)
   } catch (error) {
     res.status(500).json({ message: 'Failed to create product', error: error.message });
   }
 };
+
 
 // @desc    Get all products
 // @route   GET /api/products
