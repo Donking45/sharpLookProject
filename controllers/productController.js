@@ -47,6 +47,7 @@ const createProduct = async (req, res) => {
     });
     
   } catch (error) {
+    console.error("CREATE PRODUCT ERROR:", error)
     res.status(500).json({ message: 'Failed to create product', error: error.message });
   }
 };
