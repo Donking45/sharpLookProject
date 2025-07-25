@@ -10,16 +10,11 @@ const createProduct = async (req, res) => {
 
     const { name, description, price, category } = req.body;
 
-    if (!name || !description  || !price  || !category ) {
-      return res.status(400).json({ message: "Please enter all fields" });
-    }
-
     if (!req.file) {
       return res.status(400).json({
         message: 'Image is required'
       })
     }
-
 
     const result = await cloudinary.uploader.upload(req.file.path,{ 
       folder: "products",
@@ -27,20 +22,24 @@ const createProduct = async (req, res) => {
        crop: "scale"
       })
 
-      
+    if (!name || !description  || !price  || !category ) {
+      return res.status(400).json({ message: "Please enter all fields" });
+    }
+
+
+    const imageURL = result.secure_url;
+
     const newProduct = new Product({
       name,
       description,
       price,
       category,
       vendorId: req.vendor._id,
-      image: {
-        public_id: result.public_id,
-        url: result.secure_url
-      }
+      image:imageURL
     });
 
     await newProduct.save();
+
     res.status(201).json({
       message:"Product listed successfully",
       product: newProduct,
