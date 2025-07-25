@@ -6,10 +6,18 @@ const cloudinary = require('../utils/cloudinary');
 // @access  Private (Vendor only)
 const createProduct = async (req, res) => {
   try {
-    const { name, description, price, category, image } = req.body;
+    const { name, description, price: priceInput, category, image } = req.body;
+
+    const price = Number(priceInput);
 
     if (!name || !description || !req.file || !price  || !category) {
       return res.status(400).json({ message: "Please enter all fields" });
+    }
+
+    if (isNaN(price)) {
+      return res.status(400).json({
+        message: "Price must be a valid number"
+      })
     }
 
     const result = await cloudinary.uploader.upload_stream(image,
