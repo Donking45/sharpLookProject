@@ -6,16 +6,24 @@ const cloudinary = require('../utils/cloudinary');
 // @access  Private (Vendor only)
 const createProduct = async (req, res) => {
    
-  const { name, description, price, category, image } = req.body;
- 
   try {
-    const result = await cloudinary.uploader.upload(image,{ 
+
+    const { name, description, price, category } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({
+        message: 'Image is required'
+      })
+    }
+
+
+    const result = await cloudinary.uploader.upload(req.file.path,{ 
       folder: "products",
        width: 300, 
        crop: "scale"
       })
 
-    if (!name || !description  || !price  || !category || !req.file) {
+    if (!name || !description  || !price  || !category ) {
       return res.status(400).json({ message: "Please enter all fields" });
     }
     
