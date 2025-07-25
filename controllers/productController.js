@@ -15,10 +15,11 @@ const createProduct = async (req, res) => {
        crop: "scale"
       })
 
-    if (!name || !description  || !price  || !category) {
+    if (!name || !description  || !price  || !category || !req.file) {
       return res.status(400).json({ message: "Please enter all fields" });
     }
-
+    
+    const imageUrl = req.file.path;
       
     const newProduct = new Product({
       name,
@@ -26,10 +27,7 @@ const createProduct = async (req, res) => {
       price,
       category,
       vendorId: req.vendor._id,
-      image: {
-        public_id: result.public_id,
-        url: result.secure_url
-      }
+      image: imageUrl
     });
 
     await newProduct.save();
