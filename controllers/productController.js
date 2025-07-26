@@ -27,7 +27,7 @@ const createProduct = async (req, res) => {
     }
 
 
-    const imageURL = result.secure_url;
+    //const imageURL = result.secure_url;
 
     const newProduct = new Product({
       name,
@@ -35,7 +35,10 @@ const createProduct = async (req, res) => {
       price,
       category,
       vendorId: req.vendor._id,
-      image:imageURL
+      image: {
+        public_id: result.public_id,
+        url: result.secure_url
+      }
     });
 
     await newProduct.save();
