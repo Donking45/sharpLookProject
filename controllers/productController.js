@@ -8,15 +8,9 @@ const createProduct = async (req, res) => {
    
   try {
 
-    const { name, description, price, category } = req.body;
+    const { name, description, price, category, image } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({
-        message: 'Image is required'
-      })
-    }
-
-    const result = await cloudinary.uploader.upload(req.file.path,{ 
+    const result = await cloudinary.uploader.upload(image,{ 
       folder: "products",
        width: 300, 
        crop: "scale"
