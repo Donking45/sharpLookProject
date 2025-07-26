@@ -8,12 +8,17 @@ const createProduct = async (req, res) => {
    
   try {
 
-    const { name, description, price, category, image } = req.body;
+    const { name, description, price, category } = req.body;
 
-    const result = await cloudinary.uploader.upload(image,{ 
-      folder: "products",
-       width: 300, 
-       crop: "scale"
+    const result = await cloudinary.uploader.upload(req.file.path,{ 
+        if(err) {
+          console.Console.log(err);
+          return res.status(500).json({
+            success: false,
+            message: "Error"
+          })
+        }
+      
       })
 
     if (!name || !description  || !price  || !category ) {
