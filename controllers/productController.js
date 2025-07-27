@@ -1,27 +1,36 @@
 const Product = require('../models/productModel');
-const uploadImage = require('../utils/cloudinary');
+const cloudinary = require('../utils/cloudinary');
 
 // @desc    Create new product
 // @route   POST /api/products
 // @access  Private (Vendor only)
 const createProduct = async (req, res) => {
 
-    const { name, description, price, category} = req.body;
+    const { name, description, price, category, image} = req.body;
 
     try {
-      if(!file) {
-        return res.status(400).json({message: "No image uploaded"});
+      const result = await cloudinary.uploader.upload(image, {
+        folder: "onlineShop",
+        width: 300,
+        crop: "scale"
+      })
+
+      if(!name || !description || !category || !price || !image){
+          return res.status(400).json({
+            message: "Please enter all fields"
+          })
       }
-
-      const uploadedImageUrl = await uploadImage(file.path);
-
+  
 
       const product = new Product ({
         name,
         description,
         price,
         category,
-        image: uploadedImageUrl,
+        image: {
+          public_id: result.public_id,
+          url: result.secure_url
+        },
       });
 
       const savedProduct = await product.save();
