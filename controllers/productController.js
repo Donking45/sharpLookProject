@@ -11,7 +11,7 @@ const createProduct = async (req, res) => {
     try {
       if(image){
         const uploadRes = await cloudinary.uploader.upload(image,{
-          upload_preset: "online-shape-look-shop"
+          upload_preset: "online-shape-look-shop",
         })
 
         if(uploadRes){
@@ -24,8 +24,7 @@ const createProduct = async (req, res) => {
           })
 
           const savedProduct = await product.save();
-
-          req.statusCode(200).send(savedProduct);
+          req.status(200).send(savedProduct);
         }
     }
 
