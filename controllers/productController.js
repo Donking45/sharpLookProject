@@ -1,5 +1,5 @@
 const Product = require('../models/productModel');
-const cloudinary = require('../utils/cloudinary');
+const uploadImage = require('../utils/cloudinary');
 
 // @desc    Create new product
 // @route   POST /api/products
@@ -9,24 +9,23 @@ const createProduct = async (req, res) => {
     const { name, description, price, category} = req.body;
 
     try {
-      if(!req.file){
-        return res.status(400).json({ error: "Image file is required"});
+      if(!file) {
+        return res.status(400).json({message: "No image uploaded"});
       }
 
-      const uploadedResponse = await cloudinary.uploader.upload(req.file.path, {
-        upload_preset: "online-shape-look-shop",
-      })
+      const uploadedImageUrl = await uploadImage(file.path);
 
-          const product = new Product ({
-            name,
-            description,
-            price,
-            category,
-            image: uploadedResponse.secure_url,
-          })
 
-        const savedProduct = await product.save();
-        res.status(200).send(savedProduct);
+      const product = new Product ({
+        name,
+        description,
+        price,
+        category,
+        image: uploadedImageUrl,
+      });
+
+      const savedProduct = await product.save();
+      res.status(200).send(savedProduct);
     } catch (error) {
         console.log(error)
         res.status(500).send(error);

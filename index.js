@@ -2,6 +2,7 @@ const express  = require("express")
 const mongoose = require("mongoose")
 const routes = require('./routes')
 const cors = require('cors')
+const upload = require('./utils/cloudinary')
 
 require('dotenv').config(); 
 
@@ -16,6 +17,12 @@ app.use(express.json())
 app.use(express.urlencoded({
   extended: true
 }))
+
+app.post("/upload", (req, res) => {
+  upload(req.body.image)
+     .then((url) => res.send(url))
+     .catch((err) => res.status(500).send(err))
+})
 
 
 // Routes
