@@ -8,7 +8,7 @@ const {
   deleteProduct,
 } = require('../controllers/productController');
 const { vendorAuth } = require('../middlewares/venMiddleware');
-//const upload = require('../middlewares/multer')
+const upload = require('../middlewares/multer')
 
 // Public
 router.get('/product', getAllProducts);
