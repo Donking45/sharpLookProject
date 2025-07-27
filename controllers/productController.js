@@ -10,27 +10,27 @@ const createProduct = async (req, res) => {
 
     try {
       if(image){
-        const uploadRes = await cloudinary.uploader.upload(image,{
+        const uploadedResponse = await cloudinary.uploader.upload(image, {
           upload_preset: "online-shape-look-shop",
         })
 
-        if(uploadRes){
+        if(uploadedResponse) {
           const product = new Product ({
             name,
-            category,
-            price,
             description,
-            image: uploadRes
+            price,
+            category,
+            image: uploadedResponse
           })
 
           const savedProduct = await product.save();
-          req.status(200).send(savedProduct);
+          res.status(200).send(savedProduct);
         }
     }
 
   } catch (error) {
     console.log(error)
-    res.status(500).json({ message: 'Failed to create product', error: error.message });
+    res.status(500).send(error);
   }
 };
 
