@@ -6,32 +6,31 @@ const cloudinary = require('../utils/cloudinary');
 // @access  Private (Vendor only)
 const createProduct = async (req, res) => {
 
-    const { name, description, price, category, image } = req.body;
+    const { name, description, price, category} = req.body;
 
     try {
-      if(image){
-        const uploadedResponse = await cloudinary.uploader.upload(image, {
-          upload_preset: "online-shape-look-shop",
-        })
+      if(!req.file){
+        return res.status(400).json({ error: "Image file is required"});
+      }
 
-        if(uploadedResponse) {
+      const uploadedResponse = await cloudinary.uploader.upload(req.file.path, {
+        upload_preset: "online-shape-look-shop",
+      })
+
           const product = new Product ({
             name,
             description,
             price,
             category,
-            image: uploadedResponse
+            image: uploadedResponse.secure_url,
           })
 
-          const savedProduct = await product.save();
-          res.status(200).send(savedProduct);
-        }
+        const savedProduct = await product.save();
+        res.status(200).send(savedProduct);
+    } catch (error) {
+        console.log(error)
+        res.status(500).send(error);
     }
-
-  } catch (error) {
-    console.log(error)
-    res.status(500).send(error);
-  }
 };
 
 

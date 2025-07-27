@@ -15,7 +15,7 @@ router.get('/product', getAllProducts);
 router.get('/product/:id', getProductById);
 
 // Vendor-only
-router.post('/product/create', vendorAuth, createProduct);
+router.post('/product/create', upload.single("image"), vendorAuth, createProduct);
 router.put('/product/:id', vendorAuth, updateProduct);
 router.delete('/product/:id', vendorAuth, deleteProduct);
 
