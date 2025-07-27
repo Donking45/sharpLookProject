@@ -5,50 +5,32 @@ const cloudinary = require('../utils/cloudinary');
 // @route   POST /api/products
 // @access  Private (Vendor only)
 const createProduct = async (req, res) => {
-   
-  try {
 
-    const { name, description, price, category } = req.body;
+    const { name, description, price, category, image } = req.body;
 
-    const result = await cloudinary.uploader.upload(req.file.path,{ 
-        if(err) {
-          console.Console.log(err);
-          return res.status(500).json({
-            success: false,
-            message: "Error"
+    try {
+      if(image){
+        const uploadRes = await cloudinary.uploader.upload(image,{
+          upload_preset: "online-shape-look-shop"
+        })
+
+        if(uploadRes){
+          const product = new Product ({
+            name,
+            category,
+            price,
+            description,
+            image: uploadRes
           })
-        }
-      
-      })
 
-    if (!name || !description  || !price  || !category ) {
-      return res.status(400).json({ message: "Please enter all fields" });
+          const savedProduct = await product.save();
+
+          req.statusCode(200).send(savedProduct);
+        }
     }
 
-
-    //const imageURL = result.secure_url;
-
-    const newProduct = new Product({
-      name,
-      description,
-      price,
-      category,
-      vendorId: req.vendor._id,
-      image: {
-        public_id: result.public_id,
-        url: result.secure_url
-      }
-    });
-
-    await newProduct.save();
-
-    res.status(201).json({
-      message:"Product listed successfully",
-      product: newProduct,
-    });
-    
   } catch (error) {
-    console.error("CREATE PRODUCT ERROR:", error)
+    console.log(error)
     res.status(500).json({ message: 'Failed to create product', error: error.message });
   }
 };
