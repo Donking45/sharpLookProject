@@ -8,14 +8,14 @@ const {
   deleteProduct,
 } = require('../controllers/productController');
 const { vendorAuth } = require('../middlewares/venMiddleware');
-const upload = require('../middlewares/multer')
+//const upload = require('../middlewares/multer')
 
 // Public
 router.get('/product', getAllProducts);
 router.get('/product/:id', getProductById);
 
 // Vendor-only
-router.post('/product/create', upload.single('image'), vendorAuth, createProduct);
+router.post('/product/create', vendorAuth, createProduct);
 router.put('/product/:id', vendorAuth, updateProduct);
 router.delete('/product/:id', vendorAuth, deleteProduct);
 
