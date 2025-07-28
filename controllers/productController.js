@@ -82,7 +82,7 @@ const updateProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    if (product.vendor.toString() !== req.vendor.id)
+    if (product.vendorId.toString() !== req.vendor.id)
       return res.status(403).json({ message: 'Not authorized to update this product' });
 
     const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -100,7 +100,7 @@ const deleteProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    if (product.vendor.toString() !== req.vendor.id)
+    if (product.vendorId.toString() !== req.vendor.id)
       return res.status(403).json({ message: 'Not authorized to delete this product' });
 
     await product.remove();
