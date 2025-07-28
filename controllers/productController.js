@@ -1,5 +1,6 @@
 const Product = require('../models/productModel');
 const cloudinary = require('../utils/cloudinary');
+const Vendor = require('../models/vendorModel');
 
 // @desc    Create new product
 // @route   POST /api/products
