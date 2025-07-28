@@ -8,19 +8,21 @@ const createProduct = async (req, res) => {
 
     const { name, description, price, category, image} = req.body;
 
+    if(!name || !description || !category || !price || !image){
+      return res.status(400).json({
+        message: "Please enter all fields"
+      })
+  }
+
     try {
+      console.log("Uploading image to Cloudinary...");
       const result = await cloudinary.uploader.upload(image, {
         folder: "onlineShop",
         width: 300,
         crop: "scale"
-      })
+      });
 
-      if(!name || !description || !category || !price || !image){
-          return res.status(400).json({
-            message: "Please enter all fields"
-          })
-      }
-  
+      console.log("Uploading result:", result);
 
       const product = new Product ({
         name,
@@ -36,8 +38,11 @@ const createProduct = async (req, res) => {
       const savedProduct = await product.save();
       res.status(200).send(savedProduct);
     } catch (error) {
-        console.log(error)
-        res.status(500).send(error);
+        console.error("Error creating product:", error );
+        res.status(500).json({
+          message: "Internal server error",
+          error: error.message || error
+        });
     }
 };
 
