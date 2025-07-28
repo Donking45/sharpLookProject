@@ -6,9 +6,9 @@ const cloudinary = require('../utils/cloudinary');
 // @access  Private (Vendor only)
 const createProduct = async (req, res) => {
 
-    const { name, description, price, category, image} = req.body;
+    const { name, description, price, category, image, vendorId} = req.body;
 
-    if(!name || !description || !category || !price || !image){
+    if(!vendorId || !name || !description || !category || !price || !image){
       return res.status(400).json({
         message: "Please enter all fields"
       })
@@ -29,6 +29,7 @@ const createProduct = async (req, res) => {
         description,
         price,
         category,
+        vendorId,
         image: {
           public_id: result.public_id,
           url: result.secure_url
