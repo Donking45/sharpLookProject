@@ -1,4 +1,5 @@
 const Order = require('../models/orderModel');
+const User = require('../models/userModel');
 
 //  Create a new order
 const placeOrder = async (req, res) => {
