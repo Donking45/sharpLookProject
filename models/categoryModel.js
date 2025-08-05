@@ -9,10 +9,6 @@ const categorySchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  amount: {
-    type: Number,
-    required: true,
-  },
   image: {
     type: String,
   }

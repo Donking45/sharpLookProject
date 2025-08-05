@@ -3,26 +3,44 @@ const cloudinary = require('../utils/cloudinary');
 
 // @desc Create a new category
 const createCategory = async (req, res) => {
-  try {
-    const { name, image } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ message: 'Category name is required' });
-    }
+    const { name, image} = req.body;
 
-    let imageUrl = '';
-    if (image) {
-      imageUrl = await cloudinary.uploader.upload(image);
-    }
-
-    const newCategory = new Category({ name, image: imageUrl });
-    const savedCategory = await newCategory.save();
-
-    res.status(201).json({ message: 'Category created', data: savedCategory });
-  } catch (err) {
-    res.status(500).json({ message: 'Creation failed', error: err.message });
+    if(!name || !image){
+      return res.status(400).json({
+        message: "Please enter all fields"
+      })
   }
+
+    try {
+      console.log("Uploading image to Cloudinary...");
+      const result = await cloudinary.uploader.upload(image, {
+        folder: "onlineShop",
+        width: 300,
+        crop: "scale"
+      });
+
+      console.log("Uploading result:", result);
+
+      const category = new Category ({
+        name,
+        image: {
+          public_id: result.public_id,
+          url: result.secure_url
+        },
+      });
+
+      const savedCategory = await category.save();
+      res.status(200).send(savedCategory);
+    } catch (error) {
+        console.error("Error creating category:", error );
+        res.status(500).json({
+          message: "Internal server error",
+          error: error.message || error
+        });
+    }
 };
+
 
 // @desc Get all categories
 const getAllCategories = async (req, res) => {
