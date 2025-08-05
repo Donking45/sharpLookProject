@@ -72,9 +72,15 @@ const updateCategory = async (req, res) => {
     if (!category) return res.status(404).json({ message: 'Category not found' });
 
     if (name) category.name = name;
+
     if (image) {
-      const imageUrl = await upload(image);
-      category.image = imageUrl;
+      const result = await cloudinary.uploader.upload(image, {
+        folder: "onlineShop",
+        width: 300,
+        crop: "scale"
+      });
+
+      category.image = result.secure_url
     }
 
     await category.save();
@@ -83,6 +89,7 @@ const updateCategory = async (req, res) => {
     res.status(500).json({ message: 'Update failed', error: err.message });
   }
 };
+
 
 // @desc Delete category by ID
 const deleteCategory = async (req, res) => {
