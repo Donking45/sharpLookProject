@@ -12,7 +12,7 @@ const createCategory = async (req, res) => {
 
     let imageUrl = '';
     if (image) {
-      imageUrl = await cloudinary(image);
+      imageUrl = await cloudinary.uploader.upload(image);
     }
 
     const newCategory = new Category({ name, image: imageUrl });
