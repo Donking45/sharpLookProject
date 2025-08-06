@@ -4,7 +4,7 @@ const createTransaction = async (req, res) => {
   try {
     const { userId, amount, type, status } = req.body;
 
-    if (!user || !amount || !type) {
+    if (!userId || !amount || !type || !status) {
       return res.status(400).json({ message:'All required fields must be provided'})
     }
 

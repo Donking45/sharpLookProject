@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 
-router.post('/create', createTransaction)
+router.post('/create/transaction', createTransaction)
 
 // Get Transaction History
 router.get('/transactions/:userId', getTransactions)
