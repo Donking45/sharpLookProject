@@ -80,11 +80,15 @@ const updateCategory = async (req, res) => {
         crop: "scale"
       });
 
-      category.image = result.secure_url
-    }
+      console.log("Updating result", result)
 
-    await category.save();
-    res.status(200).json({ message: 'Category updated', data: category });
+      category.image = {
+        public_id: result.public_id,
+        url: result.secure_url
+      }
+    }
+    const updatedCategory = await category.save();
+    res.status(200).json({ message: 'Category updated', data: updatedCategory });
   } catch (err) {
     res.status(500).json({ message: 'Update failed', error: err.message });
   }
