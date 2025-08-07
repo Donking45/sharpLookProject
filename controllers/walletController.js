@@ -14,11 +14,11 @@ const fundWallet = async (req, res) => {
     }
 
     // Get user’s wallet
-    let wallet = await Wallet.findOne({ user: userId });
+    let wallet = await Wallet.findOne({ userId });
 
     if (!wallet) {
       // Create a wallet for the user if it doesn't exist
-      wallet = new Wallet({ user: userId, balance: 0 });
+      wallet = new Wallet({userId, balance: 0 });
     }
 
     // Update wallet balance
@@ -27,7 +27,7 @@ const fundWallet = async (req, res) => {
 
     // Create transaction
     const transaction = new Transaction({
-      user: userId,
+      userId,
       type: "credit",
       amount,
       purpose: "wallet funding",
@@ -61,7 +61,7 @@ const withdrawWallet = async (req, res) => {
     }
 
     // Find the user’s wallet
-    const wallet = await Wallet.findOne({ user: userId });
+    const wallet = await Wallet.findOne({ userId });
 
     if (!wallet) {
       return res.status(404).json({ message: "Wallet not found for this user." });
@@ -78,7 +78,7 @@ const withdrawWallet = async (req, res) => {
 
     // Log withdrawal as a transaction
     const transaction = new Transaction({
-      user: userId,
+      userId,
       type: "debit",
       amount,
       purpose: "wallet withdrawal",
