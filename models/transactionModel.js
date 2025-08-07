@@ -14,6 +14,6 @@ const transactionSchema = new mongoose.Schema({
     enum: ['pending', 'completed', 'failed'],
     default: 'pending'
   },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

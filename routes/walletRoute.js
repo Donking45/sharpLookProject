@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {fundWallet, withdrawWallet } = require('../controllers/wallletController');
+const {fundWallet, withdrawWallet } = require('../controllers/walletController');
 
 
 // Fund Wallet

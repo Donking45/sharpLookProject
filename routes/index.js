@@ -6,6 +6,7 @@ const productRoute = require('./productRoute')
 const orderRoute = require('./orderRoute')
 const categoryRoute = require('./categoryRoute')
 const transactionRoute = require('./transactionRoute')
+const walletRoute = require('./walletRoute')
 
 
 
@@ -18,7 +19,8 @@ const routes = [
     paystackRoute,
     productRoute,
     orderRoute,
-    transactionRoute
+    transactionRoute,
+    walletRoute
 ]
 
 module.exports = routes
