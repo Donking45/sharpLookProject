@@ -1,37 +1,42 @@
-const axios = require('axios');
-const Order = require('../models/orderModel');
+const cors = require('cors');
 
-const initiateProductPayment = async (req, res) => {
-  try {
-    const { orderId } = req.body;
-    const order = await Order.findById(orderId).populate('user');
 
-    const response = await axios.post('https://api.paystack.co/transaction/initialize',
-      {
-        email: order.user.email,
-        amount: order.totalAmount * 100, // in kobo
-        metadata: {
-          orderId: order._id.toString(),
-          custom_fields: [
-            {
-              display_name: "Customer ID",
-              value: order.user._id.toString()
-            }
-          ]
-        }
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      });
+const initiatePayment = async (req, res) => {
+  const https = require('https')
 
-    res.status(200).json({ message: 'Payment initiated', data: response.data.data });
-  } catch (error) {
-    res.status(500).json({ message: 'Payment initialization failed', error: error.message });
+  const params = JSON.stringify({
+     "email": "customer@email.com",
+     "amount": "20000"
+  })
+
+  const options = {
+    hostname: 'api.paystack.co',
+    port: 443,
+    path: '/transaction/initialize',
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer sk_test_c5720e30c019711ef0bfa5d503b2ca8efe4f20ae',
+      'Content-Type': 'application/json'
+    }
   }
-};
 
+  const reqpaystack = https.request(options, respaystack => {
+     let data = ''
 
-module.exports =  {initiateProductPayment};
+    respaystack.on('data', (chunk) => {
+      data += chunk
+    });
+
+    respaystack.on('end', () => {
+      res.send(data)
+      console.log(JSON.parse(data))
+    })
+  }).on('error', error => {
+     console.error(error)
+  })
+
+reqpaystack.write(params)
+reqpaystack.end()
+}
+
+module.exports =  {initiatePayment};
